@@ -17,6 +17,9 @@ sim-kaido-motors/
 ├── .gitignore
 ├── docs/
 │   └── kaido-motors-case-study.pdf    # Enunciado del caso
+├── examples/
+│   ├── annex4_demand_baseline.ipynb   # Ejemplo del Anexo 4 en notebook (con gráficos)
+│   └── annex4_demand_baseline.py      # Mismo ejemplo en script (sin gráficos)
 └── data/
     ├── ventas_mensual.csv             # Ventas de Kaido por mes, segmento y canal (A003-A012)
     ├── stock_mensual.csv              # Stock de la red por mes y segmento (A009-A012)
@@ -57,6 +60,15 @@ def leer(fichero):
 mercado = leer("mercado_mensual.csv")
 macro = leer("macro_mensual.csv")
 ```
+
+## Código de ejemplo
+
+El Anexo 4 del enunciado está disponible en dos formatos con el mismo código y las mismas secciones:
+
+- **`examples/annex4_demand_baseline.ipynb`**: notebook **con visualización** (serie, descomposición y comparación con A012).
+- **`examples/annex4_demand_baseline.py`**: script **sin visualización**.
+
+Prepara el mercado del SUV medio, lo separa en tendencia, estacionalidad y resto, y ajusta un modelo SARIMAX con dos variables económicas y el calendario. Entrena hasta A011 y compara la previsión con lo que pasó en A012. Es un punto de partida, no la solución del caso.
 
 ## Los años del caso
 
