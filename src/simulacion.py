@@ -29,6 +29,13 @@ PLAZO_MESES = 3  # la decisión de hoy llega dentro de tres meses
 Z_DEFECTO = 1.28  # cubre nueve de cada diez meses
 MESES_REFERENCIA_LLEGADAS = 6  # meses de A012 que fijan las llegadas ya en camino
 
+# Revisión mensual del plan: la previsión de los meses futuros se corrige con la
+# razón entre las ventas y la previsión de los últimos tres meses, a medias (la
+# demanda no servida no se observa) y acotada.
+VENTANA_REVISION = 3
+PESO_REVISION = 0.5
+LIMITES_REVISION = (0.5, 1.5)
+
 # Edad (días) a 31 de diciembre de cada bloque de 30 días del stock inicial.
 EDADES_0_90 = (15, 45, 75)
 EDADES_91_180 = (105, 135, 165)
@@ -48,7 +55,10 @@ def economia_segmentos(datos: dict[str, pd.DataFrame]) -> pd.DataFrame:
         "vm_real_mas_180_eur": "vm_mas_180",
     }
     ficha = datos["segmentos"].set_index("segmento")[list(columnas)]
-    return ficha.rename(columns=columnas).reindex(SEGMENTOS)
+    economia = ficha.rename(columns=columnas).reindex(SEGMENTOS)
+    # CSUV no tiene ventas con más de 180 días: se usa el VM del tramo anterior.
+    economia["vm_mas_180"] = economia["vm_mas_180"].fillna(economia["vm_91_180"])
+    return economia
 
 
 def stock_inicial(datos: dict[str, pd.DataFrame]) -> dict[str, pd.DataFrame]:
@@ -153,64 +163,62 @@ def _vm_por_edad(edad: np.ndarray, economia: pd.Series) -> np.ndarray:
     )
 
 
-def simular_segmento(
-    segmento: str,
-    demanda: pd.Series,
-    llegadas: pd.Series,
-    cohortes: pd.DataFrame,
+def avanzar_mes(
+    entrada: np.ndarray,
+    unidades: np.ndarray,
+    mes: int,
+    llegada: float,
+    demanda: float,
     economia: pd.Series,
-) -> pd.DataFrame:
-    """Simula un año de un segmento y devuelve una fila por mes.
+) -> tuple[np.ndarray, np.ndarray, dict]:
+    """Simula un mes de un segmento: entrada de coches, venta FIFO y costes.
 
     `V = min(D, S + L)`; lo que no se puede servir son ventas perdidas (no hay
     transfers en esta versión). El coste del stock es el de la marca: 2 €/coche/día
     mientras el coche lleva menos de 180 días facturado, incluidos los días de A012 de
     los coches que ya estaban en la red. No incluye los intereses del concesionario.
+    Devuelve las cohortes que quedan y los resultados del mes.
     """
-    entrada = cohortes["entrada"].to_numpy(dtype=float)
-    unidades = cohortes["unidades"].to_numpy(dtype=float)
-    filas = []
-    for mes in range(len(DIAS_MES)):
-        entrada = np.append(entrada, MITAD_MES[mes])
-        unidades = np.append(unidades, float(llegadas.iloc[mes]))
-        orden = np.argsort(entrada, kind="stable")
-        entrada, unidades = entrada[orden], unidades[orden]
+    entrada = np.append(entrada, MITAD_MES[mes])
+    unidades = np.append(unidades, float(llegada))
+    orden = np.argsort(entrada, kind="stable")
+    entrada, unidades = entrada[orden], unidades[orden]
 
-        stock_ini = unidades.sum() - llegadas.iloc[mes]
-        vendidos = min(float(demanda.iloc[mes]), unidades.sum())
-        # FIFO: lo vendido sale de las cohortes más antiguas.
-        acumulado = np.cumsum(unidades)
-        salen = np.clip(vendidos - (acumulado - unidades), 0.0, unidades)
-        quedan = unidades - salen
+    stock_ini = unidades.sum() - llegada
+    vendidos = min(float(demanda), unidades.sum())
+    # FIFO: lo vendido sale de las cohortes más antiguas.
+    acumulado = np.cumsum(unidades)
+    salen = np.clip(vendidos - (acumulado - unidades), 0.0, unidades)
+    quedan = unidades - salen
 
-        edad_venta = MITAD_MES[mes] - entrada
-        vm = (salen * _vm_por_edad(edad_venta, economia)).sum()
-        coste = (
-            salen * _coste_dias(entrada, INICIO_MES[mes], MITAD_MES[mes])
-            + quedan * _coste_dias(entrada, INICIO_MES[mes], FIN_MES[mes])
-        ).sum()
+    edad_venta = MITAD_MES[mes] - entrada
+    vm = (salen * _vm_por_edad(edad_venta, economia)).sum()
+    coste = (
+        salen * _coste_dias(entrada, INICIO_MES[mes], MITAD_MES[mes])
+        + quedan * _coste_dias(entrada, INICIO_MES[mes], FIN_MES[mes])
+    ).sum()
+    edad_fin = FIN_MES[mes] - entrada
+    fila = {
+        "mes": mes + 1,
+        "stock_inicial": stock_ini,
+        "llegadas": float(llegada),
+        "demanda": float(demanda),
+        "ventas": vendidos,
+        "perdidas": float(demanda) - vendidos,
+        "stock_fin": quedan.sum(),
+        "stock_0_90": quedan[edad_fin <= 90].sum(),
+        "stock_91_180": quedan[(edad_fin > 90) & (edad_fin <= 180)].sum(),
+        "stock_mas_180": quedan[edad_fin > 180].sum(),
+        "beneficio_bruto": vendidos * economia["bruto"],
+        "vm": vm,
+        "coste_stock": coste,
+    }
+    vivos = quedan > 1e-9
+    return entrada[vivos], quedan[vivos], fila
 
-        edad_fin = FIN_MES[mes] - entrada
-        filas.append(
-            {
-                "segmento": segmento,
-                "mes": mes + 1,
-                "stock_inicial": stock_ini,
-                "llegadas": float(llegadas.iloc[mes]),
-                "demanda": float(demanda.iloc[mes]),
-                "ventas": vendidos,
-                "perdidas": float(demanda.iloc[mes]) - vendidos,
-                "stock_fin": quedan.sum(),
-                "stock_0_90": quedan[edad_fin <= 90].sum(),
-                "stock_91_180": quedan[(edad_fin > 90) & (edad_fin <= 180)].sum(),
-                "stock_mas_180": quedan[edad_fin > 180].sum(),
-                "beneficio_bruto": vendidos * economia["bruto"],
-                "vm": vm,
-                "coste_stock": coste,
-            }
-        )
-        entrada, unidades = entrada[quedan > 1e-9], quedan[quedan > 1e-9]
-    resultado = pd.DataFrame(filas)
+
+def _derivadas(resultado: pd.DataFrame, economia: pd.Series) -> pd.DataFrame:
+    """Añade CVP, CVP de las ventas perdidas y coste del transfer alternativo."""
     resultado["cvp"] = resultado["beneficio_bruto"] - resultado["vm"]
     resultado["cvp_perdido"] = resultado["perdidas"] * (
         economia["bruto"] - economia["vm_0_90"]
@@ -219,6 +227,25 @@ def simular_segmento(
         resultado["perdidas"] * PCT_TRANSFER * economia["bruto"]
     )
     return resultado
+
+
+def simular_segmento(
+    segmento: str,
+    demanda: pd.Series,
+    llegadas: pd.Series,
+    cohortes: pd.DataFrame,
+    economia: pd.Series,
+) -> pd.DataFrame:
+    """Simula un año de un segmento con llegadas dadas y devuelve una fila por mes."""
+    entrada = cohortes["entrada"].to_numpy(dtype=float)
+    unidades = cohortes["unidades"].to_numpy(dtype=float)
+    filas = []
+    for mes in range(len(DIAS_MES)):
+        entrada, unidades, fila = avanzar_mes(
+            entrada, unidades, mes, llegadas.iloc[mes], demanda.iloc[mes], economia
+        )
+        filas.append({"segmento": segmento, **fila})
+    return _derivadas(pd.DataFrame(filas), economia)
 
 
 def simular_anio(
@@ -243,8 +270,8 @@ def comprobar_balance(
     """Comprueba el balance de unidades de cada segmento; una fila por comprobación.
 
     Cubre `S_fin = S_ini + L − V`, la continuidad de un mes al siguiente, la suma de
-    los tramos de antigüedad, `V + perdidas = D`, `V ≤ S + L` y la ausencia de stock
-    negativo.
+    los tramos de antigüedad, `V + perdidas = D`, `V ≤ S + L`, la ausencia de stock
+    negativo y de valores ausentes (que las sumas de pandas ignorarían en silencio).
     """
     filas = []
     for segmento, grupo in mensual.groupby("segmento", sort=False):
@@ -279,6 +306,7 @@ def comprobar_balance(
                     grupo["ventas"] - grupo["stock_inicial"] - grupo["llegadas"]
                 ).max(),
                 "stock_minimo": grupo["stock_fin"].min(),
+                "valores_ausentes": int(grupo.isna().sum().sum()),
             }
         )
     resultado = pd.DataFrame(filas)
@@ -293,5 +321,143 @@ def comprobar_balance(
         (resultado[balances] < tolerancia).all(axis=1)
         & (resultado["exceso_de_ventas"] < tolerancia)
         & (resultado["stock_minimo"] > -tolerancia)
+        & (resultado["valores_ausentes"] == 0)
     )
     return resultado
+
+METRICAS = [
+    "demanda", "ventas", "perdidas", "llegadas", "stock_medio", "stock_fin",
+    "stock_mas_90_fin", "coste_stock", "vm", "cvp", "cvp_perdido",
+    "transfer_alternativo",
+]
+
+
+def factores_demanda(
+    rng: np.random.Generator,
+    n_rep: int,
+    sd_relativa: np.ndarray,
+    phi: float,
+    rho: float,
+) -> np.ndarray:
+    """Errores multiplicativos de la demanda, de forma `(n_rep, 12, segmentos)`.
+
+    `exp(σ·ε − σ²/2)` tiene media 1: la demanda real iguala a la prevista en media.
+    `ε` combina un factor común a todos los segmentos (correlación `rho`) con otro
+    propio, ambos AR(1) con coeficiente `phi` y varianza 1.
+    """
+    meses, k = len(DIAS_MES), len(sd_relativa)
+
+    def ar1(forma):
+        x = np.empty(forma)
+        x[:, 0] = rng.standard_normal(forma[0:1] + forma[2:])
+        for mes in range(1, meses):
+            ruido = rng.standard_normal(forma[0:1] + forma[2:])
+            x[:, mes] = phi * x[:, mes - 1] + np.sqrt(1 - phi**2) * ruido
+        return x
+
+    comun = ar1((n_rep, meses))
+    propio = ar1((n_rep, meses, k))
+    eps = np.sqrt(rho) * comun[:, :, None] + np.sqrt(1 - rho) * propio
+    return np.exp(sd_relativa * eps - sd_relativa**2 / 2)
+
+
+def simular_replica(
+    demanda_real: np.ndarray,
+    demanda_plan: np.ndarray,
+    plan_inicial: np.ndarray,
+    cohortes: pd.DataFrame,
+    economia: pd.Series,
+    sd_relativa: float,
+    z: float = Z_DEFECTO,
+    llegada_perdida: int | None = None,
+) -> tuple[dict, np.ndarray]:
+    """Un año de un segmento con revisión mensual de la llegada de t + 3.
+
+    `demanda_plan` es la previsión central con la que se decide; `demanda_real` es la
+    que ocurre. Tras cerrar cada mes se corrige la previsión con las ventas
+    observadas y se recalcula solo la llegada de dentro de tres meses; lo que ya está
+    en camino no se toca. `llegada_perdida` es un mes en que no llega nada (fallo de
+    suministro). Devuelve los totales del año y el stock y las ventas de cada mes.
+    """
+    entrada = cohortes["entrada"].to_numpy(dtype=float)
+    unidades = cohortes["unidades"].to_numpy(dtype=float)
+    llegadas = plan_inicial.astype(float).copy()
+    ventas_mes = np.zeros(len(DIAS_MES))
+    mensual = np.zeros((len(DIAS_MES), 2))
+    acumulado = dict.fromkeys(
+        ["demanda", "ventas", "perdidas", "llegadas", "coste_stock", "vm", "cvp",
+         "cvp_perdido", "transfer_alternativo"], 0.0)
+    for mes in range(len(DIAS_MES)):
+        llegada = 0.0 if mes == llegada_perdida else llegadas[mes]
+        entrada, unidades, fila = avanzar_mes(
+            entrada, unidades, mes, llegada, demanda_real[mes], economia)
+        ventas_mes[mes] = fila["ventas"]
+        mensual[mes] = (fila["stock_fin"], fila["ventas"])
+        perdidas = fila["perdidas"]
+        acumulado["demanda"] += fila["demanda"]
+        acumulado["ventas"] += fila["ventas"]
+        acumulado["perdidas"] += perdidas
+        acumulado["llegadas"] += llegada
+        acumulado["coste_stock"] += fila["coste_stock"]
+        acumulado["vm"] += fila["vm"]
+        acumulado["cvp"] += fila["beneficio_bruto"] - fila["vm"]
+        acumulado["cvp_perdido"] += perdidas * (
+            economia["bruto"] - economia["vm_0_90"]
+        )
+        acumulado["transfer_alternativo"] += perdidas * PCT_TRANSFER * economia["bruto"]
+
+        destino = mes + PLAZO_MESES
+        if destino < len(DIAS_MES):
+            ventana = slice(max(0, mes - VENTANA_REVISION + 1), mes + 1)
+            previsto = demanda_plan[ventana].sum()
+            razon = ventas_mes[ventana].sum() / previsto if previsto > 0 else 1.0
+            factor = np.clip(1 + PESO_REVISION * (razon - 1), *LIMITES_REVISION)
+            proyectado = unidades.sum()
+            for j in range(mes + 1, destino):
+                esperado_j = factor * demanda_plan[j]
+                proyectado = max(0.0, proyectado + llegadas[j] - esperado_j)
+            esperada = factor * demanda_plan[destino]
+            ss = z * sd_relativa * esperada * np.sqrt(PLAZO_MESES)
+            llegadas[destino] = llegada_a_pedir(proyectado, esperada, ss)
+    acumulado["stock_medio"] = mensual[:, 0].mean()
+    acumulado["stock_fin"] = mensual[-1, 0]
+    edad_fin = FIN_MES[-1] - entrada
+    acumulado["stock_mas_90_fin"] = unidades[edad_fin > 90].sum()
+    return acumulado, mensual
+
+
+def simular_escenario(
+    demanda_prevista: pd.DataFrame,
+    demanda_plan: pd.DataFrame,
+    plan_inicial: pd.DataFrame,
+    factores: np.ndarray,
+    cohortes: dict[str, pd.DataFrame],
+    economia: pd.DataFrame,
+    sd_relativa: pd.Series,
+    z: float = Z_DEFECTO,
+    llegada_perdida: tuple[str, int] | None = None,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Repite el año con los errores `factores` y devuelve sus resultados.
+
+    La demanda real de cada repetición es la del escenario (`demanda_prevista`) por
+    el error, redondeada a coches enteros. Devuelve un array `(n_rep, segmento,
+    METRICAS)` y otro `(n_rep, mes, segmento, 2)` con stock y ventas mensuales.
+    """
+    n_rep = factores.shape[0]
+    totales = np.zeros((n_rep, len(SEGMENTOS), len(METRICAS)))
+    mensual = np.zeros((n_rep, len(DIAS_MES), len(SEGMENTOS), 2))
+    real = np.rint(demanda_prevista.to_numpy() * factores)
+    for j, segmento in enumerate(SEGMENTOS):
+        perdida = (
+            llegada_perdida[1]
+            if llegada_perdida is not None and llegada_perdida[0] == segmento
+            else None
+        )
+        for r in range(n_rep):
+            acumulado, mes_a_mes = simular_replica(
+                real[r, :, j], demanda_plan[segmento].to_numpy(),
+                plan_inicial[segmento].to_numpy(), cohortes[segmento],
+                economia.loc[segmento], sd_relativa[segmento], z, perdida)
+            totales[r, j] = [acumulado[m] for m in METRICAS]
+            mensual[r, :, j] = mes_a_mes
+    return totales, mensual

@@ -13,8 +13,8 @@ Priorizar una solución que se pueda ejecutar, comprobar y explicar en clase.
 Empezar por el método más sencillo que permita responder la pregunta. Añadir
 complejidad solo cuando mejore la validación o represente una restricción del caso.
 
-**Estado:** fases 1 (datos), 2 (previsión) y 3 (simulación determinista) completadas.
-Los escenarios con incertidumbre y las conclusiones sobre producción y beneficio
+**Estado:** fases 1 (datos), 2 (previsión), 3 (simulación determinista) y 4 (escenarios
+con incertidumbre) completadas. Las recomendaciones y los documentos de entrega
 están pendientes.
 
 El PDF es la fuente del caso; el Markdown es su versión de lectura adaptada a los
@@ -32,7 +32,7 @@ tratarlas. No corregir los datos para que encajen con una cifra narrativa.
 | `config/graficos.mplstyle` | Aspecto común de las figuras |
 | `src/datos.py` | Lectura, validaciones, fechas y preparación |
 | `src/demanda.py` | Referencia estacional, modelo de mercado, cuota y evaluación |
-| `src/escenarios.py` — futuro | Supuestos y trayectorias de los tres escenarios |
+| `src/escenarios.py` | Supuestos de los tres escenarios y su demanda prevista |
 | `src/simulacion.py` | Flujo mensual, plan de llegadas, antigüedad (FIFO) y costes |
 | `analisis.ipynb` | Hilo conductor: preguntas, ejecución y explicación |
 | `resultados/` | Tablas y figuras regenerables para el análisis y la entrega |
@@ -212,14 +212,15 @@ Antes de implementar cada parte, anotar en el notebook el supuesto, su fuente o
 justificación y su efecto esperado. Los ajustes por compras adelantadas y falta de
 stock están resueltos en la sección 1.7 del notebook, y las variables, la cuota y el
 tratamiento de CSUV en la sección 2.1; las llegadas iniciales, la edad del stock, el
-stock de seguridad base y el redondeo, en la sección 3.1. Quedan por resolver:
+stock de seguridad base y el redondeo, en la sección 3.1; la traducción de los
+sucesos, la revisión mensual y la dependencia de los errores, en la sección 4.1.
+Quedan por resolver:
 
-- Revisión mensual de la previsión con información nueva.
 - Nivel de servicio por segmento, disponibilidad/plazo de transfers y tratamiento de
   las automatriculaciones.
-- Traducción cuantitativa de los sucesos, distribución y dependencia de los errores.
-- Tratamiento del combustible y tipo de cambio: se mencionan en los escenarios,
-  pero no tienen una columna directa en el CSV económico.
+- Tamaño del combustible, el tipo de cambio y el arancel: se mencionan en los
+  escenarios, pero no tienen una columna directa en el CSV económico y no se
+  cuantifican en la fase 4.
 - Pedidos de fin de A013 que llegarían en A014 y valoración del stock final.
 
 ## 8. Orden de implementación y criterios de finalización

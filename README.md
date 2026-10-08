@@ -11,13 +11,14 @@ y simular cómo afecta a la producción, el stock y el beneficio en tres escenar
 
 ## Estado y punto de entrada
 
-**Fases 1 (datos), 2 (previsión de la demanda) y 3 (simulación determinista)
-completadas.** `src/datos.py` carga y
+**Fases 1 (datos), 2 (previsión de la demanda), 3 (simulación determinista) y 4
+(escenarios con incertidumbre) completadas.** `src/datos.py` carga y
 comprueba los CSV; `src/demanda.py` prevé la demanda mensual por segmento y
-`src/simulacion.py` simula un año de la cadena de suministro; `analisis.ipynb`
-documenta el diagnóstico de A012, la validación, la previsión de A013 y la simulación
-central determinista. La incertidumbre y los escenarios se desarrollarán en las
-siguientes fases.
+`src/escenarios.py` traduce los sucesos de la tabla 4 a parámetros y
+`src/simulacion.py` simula un año de la cadena de suministro, también con
+incertidumbre. `analisis.ipynb` documenta el diagnóstico de A012, la validación, la
+previsión de A013, la simulación determinista y los tres escenarios con 1.000
+repeticiones.
 
 Antes de trabajar, leer:
 
@@ -46,13 +47,14 @@ Kaido-Motors/
 ├── src/
 │   ├── datos.py                      # Lectura, comprobaciones y series mensuales
 │   ├── demanda.py                    # Modelo de mercado, cuota, validación y previsión
-│   └── simulacion.py                 # Plan de llegadas, stock FIFO y costes de un año
+│   ├── escenarios.py                 # Parámetros de los tres escenarios y su demanda
+│   └── simulacion.py                 # Plan de llegadas, stock FIFO, costes y Monte Carlo
 ├── resultados/                       # Tablas y figuras regenerables
 └── analisis.ipynb                    # Hilo conductor del análisis
 ```
 
-`analisis.ipynb` es el hilo conductor y llama a los módulos de `src/`. Falta
-`escenarios.py`, que se creará en su fase; sus responsabilidades están en la guía.
+`analisis.ipynb` es el hilo conductor y llama a los módulos de `src/`. Las responsabilidades de cada módulo
+están en la guía.
 
 ## Puesta en marcha
 
@@ -122,4 +124,4 @@ Los días laborables y la Semana Santa se toman de
 - Código y datos reproducibles del modelo y de la simulación.
 - Presentación de **diez minutos**.
 
-La siguiente fase son los escenarios: cuantificar sucesos y añadir incertidumbre.
+La siguiente fase es la entrega: interpretar, recomendar y preparar los documentos.
