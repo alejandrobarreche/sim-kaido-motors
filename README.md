@@ -1,85 +1,118 @@
 # Kaido Motors España: demanda, stock y beneficio
 
-Caso de uso de la asignatura **Simulación de Sistemas Logísticos** (Universidad Alfonso X el Sabio).
-Autores del caso: Jacinto Velasco y Javier Goikoetxea. Profesor: Javier Goikoetxea.
+Trabajo de **Simulación de Sistemas Logísticos**, Universidad Alfonso X el Sabio.
+Caso elaborado por Jacinto Velasco y Javier Goikoetxea. Profesor: Javier Goikoetxea.
 
-Este repositorio contiene el enunciado y los datos del caso. Es un repositorio de **solo lectura**: clonadlo o descargadlo y trabajad en vuestro propio entorno.
+El objetivo es prever la demanda mensual de los siete segmentos de Kaido para A013
+y simular cómo afecta a la producción, el stock y el beneficio en tres escenarios.
 
-> Caso basado en uno real. Los datos y los nombres se han modificado y camuflado para su uso académico. **Uso exclusivamente docente: no los difundáis fuera del curso.**
+> Material de uso exclusivamente docente. Los datos y los nombres están camuflados.
+> No se permite su publicación ni redistribución sin autorización de los autores.
 
-## Contenido
+## Estado y punto de entrada
 
-```
-sim-kaido-motors/
+**Preparación inicial completada.** Los datos están organizados y el enunciado tiene
+una versión Markdown con fórmulas, tablas e imágenes. El modelo y la simulación se
+desarrollarán en las siguientes fases.
+
+Antes de trabajar, leer:
+
+1. [Guía del proyecto](docs/guia-proyecto.md): decisiones compartidas de código,
+   gráficos, redacción, nivel de detalle y orden de implementación. También es la
+   referencia para los asistentes que trabajen en este repositorio.
+2. [Enunciado en Markdown](docs/kaido-motors-case-study.md): preguntas, restricciones
+   y anexos. El [PDF original](docs/kaido-motors-case-study.pdf) es la fuente del caso.
+3. [Datos](data/README.md): contenido, nombres originales y reglas de lectura.
+
+## Estructura actual
+
+```text
+Kaido-Motors/
 ├── README.md
 ├── requirements.txt
-├── .gitattributes
-├── .gitignore
+├── config/
+│   └── graficos.mplstyle             # Estilo común de Matplotlib
+├── data/                             # CSV de entrada y su inventario
 ├── docs/
-│   └── kaido-motors-case-study.pdf    # Enunciado del caso
-├── examples/
-│   ├── annex4_demand_baseline.ipynb   # Ejemplo del Anexo 4 en notebook (con gráficos)
-│   └── annex4_demand_baseline.py      # Mismo ejemplo en script (sin gráficos)
-└── data/
-    ├── ventas_mensual.csv             # Ventas de Kaido por mes, segmento y canal (A003-A012)
-    ├── stock_mensual.csv              # Stock de la red por mes y segmento (A009-A012)
-    ├── mercado_mensual.csv            # Mercado por mes, segmento y canal (A001-A012)
-    ├── segmentos.csv                  # Ficha de cada uno de los siete segmentos
-    ├── codigos.csv                    # Códigos de producto y su agrupación por segmento
-    ├── macro_mensual.csv              # Variables económicas, sucesos y calendario (A001-A012)
-    └── calendario_A013.csv            # Días laborables y Semana Santa de A013
+│   ├── guia-proyecto.md              # Convenciones y siguientes fases
+│   ├── kaido-motors-case-study.pdf   # Original del profesor
+│   ├── kaido-motors-case-study.md    # Versión de lectura
+│   └── img/                         # Figuras del enunciado
+├── examples/                         # Ejemplo del Anexo 4, con rutas actualizadas
+├── src/                              # Destino del futuro código reutilizable
+└── resultados/                       # Destino de las futuras tablas y figuras
 ```
 
-La descripción de cada variable está en el **Anexo 5** del enunciado.
+La estructura prevista es un notebook `analisis.ipynb` en la raíz como hilo conductor
+y cuatro módulos en `src/`: `datos.py`, `demanda.py`, `escenarios.py` y `simulacion.py`.
+Se crearán al implementar cada fase; sus responsabilidades están en la guía.
 
 ## Puesta en marcha
 
-Necesitáis Python 3.10 o superior.
+Python 3.10 o superior. Desde la raíz del repositorio:
 
 ```bash
-git clone <URL-del-repositorio>
-cd sim-kaido-motors
-
 python -m venv .venv
-source .venv/bin/activate        # En Windows: .venv\Scripts\activate
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Ejecutad siempre el código **desde la raíz del repositorio**, para que la ruta `data/` se resuelva bien.
+En Windows, activar con `.venv\Scripts\activate`.
+Si ya se utiliza un entorno de Conda para este proyecto, instalar las dependencias
+en ese entorno en lugar de crear otro.
 
-## Cómo leer los CSV
+## Leer los datos
 
-Los ficheros están separados por comas. Al leerlos hay que indicar que **solo las celdas vacías son datos que faltan**. Si no, pandas convierte el código de modelo `NA` en un valor nulo (el Anexo 4 del enunciado lo explica):
+Los CSV usan comas como separador y punto decimal. **Solo las celdas vacías son
+datos ausentes**: `NA` es un código de modelo válido.
 
 ```python
+from pathlib import Path
+
 import pandas as pd
 
-def leer(fichero):
-    return pd.read_csv("data/" + fichero, keep_default_na=False, na_values=[""])
-
-mercado = leer("mercado_mensual.csv")
-macro = leer("macro_mensual.csv")
+datos = Path("data")
+mercado = pd.read_csv(
+    datos / "mercado_mensual.csv", keep_default_na=False, na_values=[""]
+)
 ```
 
-## Código de ejemplo
+El código del proyecto se ejecutará desde la raíz. Los CSV de `data/` son las
+entradas originales: cualquier transformación se hará en memoria o se guardará
+en `resultados/`. No abrir ni guardar estos CSV con Excel, que puede cambiar
+separadores, decimales o el código `NA`.
 
-El Anexo 4 del enunciado está disponible en dos formatos con el mismo código y las mismas secciones:
+## Ejemplo del profesor
 
-- **`examples/annex4_demand_baseline.ipynb`**: notebook **con visualización** (serie, descomposición y comparación con A012).
-- **`examples/annex4_demand_baseline.py`**: script **sin visualización**.
+- [`examples/annex4_demand_baseline.ipynb`](examples/annex4_demand_baseline.ipynb):
+  explicación y visualizaciones.
+- [`examples/annex4_demand_baseline.py`](examples/annex4_demand_baseline.py):
+  versión en script; calcula la descomposición y la previsión.
 
-Prepara el mercado del SUV medio, lo separa en tendencia, estacionalidad y resto, y ajusta un modelo SARIMAX con dos variables económicas y el calendario. Entrena hasta A011 y compara la previsión con lo que pasó en A012. Es un punto de partida, no la solución del caso.
+```bash
+python examples/annex4_demand_baseline.py
+jupyter lab
+```
 
-## Los años del caso
+El ejemplo usa STL y SARIMAX para el mercado del SUV medio, entrena hasta A011 y
+prevé A012. Emplea los valores económicos reales de A012: es una evaluación
+condicionada a conocer esas variables, no una previsión operativa completa.
+Es material de referencia, no la solución del trabajo.
 
-Los años reales se han sustituido por códigos: **A001** es el primer año con datos y **A012** el último cerrado. **A013** es el año que hay que planificar y no tiene datos, salvo el calendario. Para usar librerías de series temporales, el Anexo 4 propone tratar A001 como el año ficticio 2001, A002 como 2002, y así sucesivamente.
+## Años y calendario
 
-Los días laborables y la Semana Santa **no se calculan a partir de la fecha ficticia**: se toman de `macro_mensual.csv` y, para A013, de `calendario_A013.csv`.
+Los años van de A001 a A012; A013 es el futuro y solo tiene calendario conocido.
+Para las librerías, A001 se representa como 2001, A002 como 2002, etc. En textos y
+gráficos se mostrarán los códigos del caso, no esos años ficticios.
 
-## Aviso importante sobre Excel
+Los días laborables y la Semana Santa se toman de
+`data/economia_eventos_mensuales.csv` y `data/calendario_mensual_a013.csv`.
 
-**No abráis ni guardéis los CSV con Excel.** Puede cambiar el separador (coma por punto y coma), los decimales y el código de modelo `NA` (que convierte en celda vacía). Si queréis echarles un vistazo, usad un editor de texto o pandas.
+## Entrega prevista
 
-## Nota de uso
+- Resumen ejecutivo de **dos páginas**.
+- Plan mensual por segmento y resultados de los tres escenarios según la tabla 5.
+- Código y datos reproducibles del modelo y de la simulación.
+- Presentación de **diez minutos**.
 
-Material de uso docente, exclusivo para el alumnado del curso. No se permite su publicación ni su redistribución sin autorización de los autores.
+La siguiente fase es preparar y comprobar los datos antes de ajustar modelos.

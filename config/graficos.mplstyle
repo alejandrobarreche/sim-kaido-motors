@@ -1,0 +1,39 @@
+# Estilo común de Kaido Motors. Significados de color: docs/guia-proyecto.md.
+font.family: DejaVu Sans
+font.size: 11
+figure.figsize: 9, 4.8
+figure.dpi: 120
+figure.facecolor: white
+figure.autolayout: True
+axes.facecolor: white
+axes.edgecolor: 0.65
+axes.linewidth: 0.8
+axes.spines.top: False
+axes.spines.right: False
+axes.titlesize: 14
+axes.titleweight: bold
+axes.titlelocation: left
+axes.titlepad: 12
+axes.labelsize: 11
+axes.labelcolor: 0.2
+axes.grid: True
+axes.grid.axis: y
+axes.axisbelow: True
+axes.prop_cycle: cycler('color', ['0072B2', '009E73', 'D55E00', 'CC79A7', 'E69F00', '56B4E9', '333333'])
+grid.color: 0.9
+grid.linewidth: 0.6
+lines.linewidth: 2
+lines.markersize: 4
+xtick.labelsize: 10
+ytick.labelsize: 10
+xtick.color: 0.3
+ytick.color: 0.3
+legend.frameon: False
+legend.fontsize: 10
+text.color: 0.2
+savefig.dpi: 300
+savefig.bbox: tight
+savefig.pad_inches: 0.15
+savefig.facecolor: white
+savefig.transparent: False
+svg.fonttype: none

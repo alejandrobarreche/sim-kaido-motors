@@ -17,7 +17,7 @@ from statsmodels.tsa.seasonal import STL
 leer = lambda f: pd.read_csv('data/' + f,
                              keep_default_na=False, na_values=[''])
 mercado = leer('mercado_mensual.csv')
-macro = leer('macro_mensual.csv')
+macro = leer('economia_eventos_mensuales.csv')
 
 
 # A001 pasa a ser el año ficticio 2001, A002 el 2002, ...
