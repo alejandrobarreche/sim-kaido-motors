@@ -434,14 +434,15 @@ def simular_escenario(
     cohortes: dict[str, pd.DataFrame],
     economia: pd.DataFrame,
     sd_relativa: pd.Series,
-    z: float = Z_DEFECTO,
+    z: float | pd.Series = Z_DEFECTO,
     llegada_perdida: tuple[str, int] | None = None,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Repite el año con los errores `factores` y devuelve sus resultados.
 
     La demanda real de cada repetición es la del escenario (`demanda_prevista`) por
-    el error, redondeada a coches enteros. Devuelve un array `(n_rep, segmento,
-    METRICAS)` y otro `(n_rep, mes, segmento, 2)` con stock y ventas mensuales.
+    el error, redondeada a coches enteros. `z` puede ser un valor común o uno por
+    segmento (Series). Devuelve un array `(n_rep, segmento, METRICAS)` y otro
+    `(n_rep, mes, segmento, 2)` con stock y ventas mensuales.
     """
     n_rep = factores.shape[0]
     totales = np.zeros((n_rep, len(SEGMENTOS), len(METRICAS)))
@@ -457,7 +458,8 @@ def simular_escenario(
             acumulado, mes_a_mes = simular_replica(
                 real[r, :, j], demanda_plan[segmento].to_numpy(),
                 plan_inicial[segmento].to_numpy(), cohortes[segmento],
-                economia.loc[segmento], sd_relativa[segmento], z, perdida)
+                economia.loc[segmento], sd_relativa[segmento],
+                float(z[segmento]) if isinstance(z, pd.Series) else z, perdida)
             totales[r, j] = [acumulado[m] for m in METRICAS]
             mensual[r, :, j] = mes_a_mes
     return totales, mensual

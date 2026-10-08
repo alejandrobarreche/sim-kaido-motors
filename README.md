@@ -11,14 +11,14 @@ y simular cómo afecta a la producción, el stock y el beneficio en tres escenar
 
 ## Estado y punto de entrada
 
-**Fases 1 (datos), 2 (previsión de la demanda), 3 (simulación determinista) y 4
-(escenarios con incertidumbre) completadas.** `src/datos.py` carga y
+**Las cinco fases están completadas**: datos, previsión de la demanda, simulación
+determinista, escenarios con incertidumbre y entrega. `src/datos.py` carga y
 comprueba los CSV; `src/demanda.py` prevé la demanda mensual por segmento y
 `src/escenarios.py` traduce los sucesos de la tabla 4 a parámetros y
 `src/simulacion.py` simula un año de la cadena de suministro, también con
 incertidumbre. `analisis.ipynb` documenta el diagnóstico de A012, la validación, la
 previsión de A013, la simulación determinista y los tres escenarios con 1.000
-repeticiones.
+repeticiones. Los documentos de entrega están en `docs/`.
 
 Antes de trabajar, leer:
 
@@ -42,6 +42,8 @@ Kaido-Motors/
 │   ├── guia-proyecto.md              # Convenciones y siguientes fases
 │   ├── kaido-motors-case-study.pdf   # Original del profesor
 │   ├── kaido-motors-case-study.md    # Versión de lectura
+│   ├── resumen-ejecutivo.docx/.pdf   # Resumen de dos páginas para el comité
+│   ├── presentacion.pptx/.pdf        # Presentación de diez minutos
 │   └── img/                         # Figuras del enunciado
 ├── examples/                         # Ejemplo del Anexo 4, con rutas actualizadas
 ├── src/
@@ -124,4 +126,7 @@ Los días laborables y la Semana Santa se toman de
 - Código y datos reproducibles del modelo y de la simulación.
 - Presentación de **diez minutos**.
 
-La siguiente fase es la entrega: interpretar, recomendar y preparar los documentos.
+Resumen y presentación están en `docs/`: [resumen ejecutivo](docs/resumen-ejecutivo.pdf)
+(Word y PDF) y [presentación](docs/presentacion.pdf) (PowerPoint y PDF). Sus cifras
+proceden de `resultados/tablas/`; si cambia el análisis, hay que regenerarlos. La
+sección 5 del notebook contiene la tabla 5 completa y el plan mensual recomendado.

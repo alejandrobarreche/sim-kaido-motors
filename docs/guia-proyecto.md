@@ -13,9 +13,7 @@ Priorizar una solución que se pueda ejecutar, comprobar y explicar en clase.
 Empezar por el método más sencillo que permita responder la pregunta. Añadir
 complejidad solo cuando mejore la validación o represente una restricción del caso.
 
-**Estado:** fases 1 (datos), 2 (previsión), 3 (simulación determinista) y 4 (escenarios
-con incertidumbre) completadas. Las recomendaciones y los documentos de entrega
-están pendientes.
+**Estado:** las cinco fases completadas. Resumen ejecutivo y presentación en `docs/`.
 
 El PDF es la fuente del caso; el Markdown es su versión de lectura adaptada a los
 nombres actuales. Los CSV son la fuente para calcular resultados. Si aparecen
