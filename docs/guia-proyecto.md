@@ -13,8 +13,8 @@ Priorizar una solución que se pueda ejecutar, comprobar y explicar en clase.
 Empezar por el método más sencillo que permita responder la pregunta. Añadir
 complejidad solo cuando mejore la validación o represente una restricción del caso.
 
-**Estado:** preparación del repositorio. La previsión, la simulación y las
-conclusiones numéricas están pendientes.
+**Estado:** fases 1 (datos) y 2 (previsión) completadas. La simulación, los
+escenarios y las conclusiones sobre producción y beneficio están pendientes.
 
 El PDF es la fuente del caso; el Markdown es su versión de lectura adaptada a los
 nombres actuales. Los CSV son la fuente para calcular resultados. Si aparecen
@@ -29,11 +29,11 @@ tratarlas. No corregir los datos para que encajen con una cifra narrativa.
 | `docs/` | Enunciado, esta guía y futuros documentos de entrega |
 | `examples/` | Referencia docente, separada de la solución |
 | `config/graficos.mplstyle` | Aspecto común de las figuras |
-| `src/datos.py` — futuro | Lectura, validaciones, fechas y preparación |
-| `src/demanda.py` — futuro | Referencia estacional, modelos, cuota y evaluación |
+| `src/datos.py` | Lectura, validaciones, fechas y preparación |
+| `src/demanda.py` | Referencia estacional, modelo de mercado, cuota y evaluación |
 | `src/escenarios.py` — futuro | Supuestos y trayectorias de los tres escenarios |
 | `src/simulacion.py` — futuro | Flujo mensual, revisiones, antigüedad y costes |
-| `analisis.ipynb` — futuro | Hilo conductor: preguntas, ejecución y explicación |
+| `analisis.ipynb` | Hilo conductor: preguntas, ejecución y explicación |
 | `resultados/` | Tablas y figuras regenerables para el análisis y la entrega |
 
 Crear los módulos y el notebook cuando tengan contenido ejecutable. El notebook
@@ -208,10 +208,10 @@ colores ni significados. Las figuras originales del enunciado conservan su dise�
 ### Decisiones metodológicas pendientes
 
 Antes de implementar cada parte, anotar en el notebook el supuesto, su fuente o
-justificación y su efecto esperado. Quedan por resolver:
+justificación y su efecto esperado. Los ajustes por compras adelantadas y falta de
+stock están resueltos en la sección 1.7 del notebook, y las variables, la cuota y el
+tratamiento de CSUV en la sección 2.1. Quedan por resolver:
 
-- Ajustes por compras adelantadas y señales de falta de stock.
-- Variables, cuota y tratamiento del lanzamiento de CSUV.
 - Llegadas iniciales, edad del stock y revisión mensual de la previsión.
 - Nivel de servicio, disponibilidad/plazo de transfers y redondeo de pedidos.
 - Traducción cuantitativa de los sucesos, distribución y dependencia de los errores.

@@ -1,11 +1,11 @@
 # Resultados generados
 
-Destino de las salidas reproducibles del futuro modelo y simulador:
+Salidas reproducibles de `analisis.ipynb`:
 
 - `tablas/`: CSV numéricos de demanda, validación, producción, stock y costes.
 - `figuras/`: gráficos finales en PNG y SVG.
 
-Estas subcarpetas se crearán cuando se generen resultados. Los archivos de entrada
+El notebook crea y sobrescribe estas carpetas al ejecutarse. Los archivos de entrada
 permanecen en `data/`; los documentos de entrega se prepararán en `docs/`.
 
 Nombrar cada salida por contenido y periodo, por ejemplo

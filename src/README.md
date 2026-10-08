@@ -1,8 +1,9 @@
 # Código del proyecto
 
-Aquí se crearán `datos.py`, `demanda.py`, `escenarios.py` y `simulacion.py` al
-implementar sus respectivas fases. El futuro `analisis.ipynb`, en la raíz,
-llamará a sus funciones.
+`datos.py` carga y comprueba los CSV y prepara la serie mensual por segmento.
+`demanda.py` ajusta el modelo de mercado y la cuota, valida con A012 y prevé A013.
+`escenarios.py` y `simulacion.py` se crearán en sus fases.
+`analisis.ipynb`, en la raíz, llama a sus funciones.
 
 Las responsabilidades, convenciones y comprobaciones están en la
-[guía del proyecto](../docs/guia-proyecto.md). Por ahora no hay modelos implementados.
+[guía del proyecto](../docs/guia-proyecto.md).
