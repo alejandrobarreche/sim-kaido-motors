@@ -1,0 +1,132 @@
+\appendix
+\section{Planes mensuales: pedido y llegada no son intercambiables}\label{anexo:planes}
+
+La primera tabla recoge \textbf{pedidos del plan inicial decididos durante A013}.
+Enero corresponde a llegada en abril; diciembre, a marzo de A014. Son cantidades
+enteras de una propuesta inicial, no medias ni medianas de decisiones revisadas.
+La segunda tabla recoge las \textbf{llegadas iniciales previstas en A013}.
+Enero y febrero pertenecen a compromisos anteriores estimados.
+
+\begin{table}[htbp]\centering
+\caption{Pedidos iniciales por mes de decisión A013, coches.}\label{tab:pedidos}
+{\small\setlength{\tabcolsep}{3pt}\input{tablas/pedidos.tex}}
+\fuente{\archivo{resultados/escenarios/tablas/plan_pedidos_inicial_a013_a014.csv};
+filtro por año de decisión A013}
+\end{table}
+
+\begin{table}[htbp]\centering
+\caption{Llegadas del plan inicial por mes de recepción A013, coches.}\label{tab:llegadas}
+{\small\setlength{\tabcolsep}{3pt}\input{tablas/llegadas.tex}}
+\fuente{\archivo{resultados/escenarios/tablas/plan_llegadas_inicial_a013.csv}}
+\end{table}
+
+Por ejemplo, los \num{1245} coches pedidos en enero de A013 aparecen como
+llegadas de abril. Los \num{2110} previstos para enero ya vienen en camino
+y no aparecen como un pedido que se pueda decidir en ese mismo enero.
+La diferencia anual no es un fallo de balance: cada tabla utiliza un criterio
+temporal diferente.
+\FloatBarrier
+
+\clearpage
+\begin{landscape}
+\pagestyle{plain}
+\section{Tabla de resultados completa por segmento y escenario}\label{anexo:tabla5}
+\noindent\small Medias de 1.000 réplicas. Los totales se calculan por réplica
+antes del resumen; cobertura y servicio no son sumas de ratios. El redondeo puede
+producir diferencias de una unidad. Los intereses de concesionarios se informan
+aparte de la contribución de la marca.
+\fuente{\archivo{resultados/escenarios/tablas/tabla5_plan_recomendado_a013.csv}}
+{\footnotesize\renewcommand{\arraystretch}{1.02}\setlength{\tabcolsep}{5pt}\input{tablas/anexo_tabla5.tex}}
+\end{landscape}
+\pagestyle{fancy}
+\clearpage
+
+\section{Cómo reproducir y comprobar el trabajo}\label{anexo:reproducir}
+
+\subsection{La cadena de ejecución}
+Desde la raíz del repositorio se ejecutan, con un kernel que tenga las dependencias
+instaladas, los cuatro notebooks en orden:
+\begin{center}
+\archivo{datos.ipynb} $\longrightarrow$ \archivo{demanda.ipynb}
+$\longrightarrow$ \archivo{simulacion.ipynb}
+$\longrightarrow$ \archivo{escenarios.ipynb}.
+\end{center}
+Cada uno conserva explicación, código y resultados. Las definiciones compartidas
+son celdas \archivo{api}; no se requiere ejecutar manualmente celdas fuera de orden.
+Las tablas y figuras se guardan en la carpeta de resultados de cada notebook.
+La última fase regenera también el resumen y la presentación.
+
+La ejecución de referencia utiliza semilla 42, 200 réplicas de piloto, 1.000
+finales por escenario y 18 meses simulados. Las versiones registradas incluyen
+Python 3.13.15, NumPy 2.5.3 y pandas 3.0.6; el registro completo está en
+\archivo{resultados/escenarios/tablas/configuracion_ejecucion.json}.
+
+\subsection{Qué verifican las comprobaciones}
+\noindent\begin{tabularx}{\linewidth}{@{}p{3.1cm}Y@{}}\toprule
+Bloque & Comprobaciones relevantes \\\midrule
+Datos & Claves, fechas, lecturas de ausentes, identidad de clientes netos,
+balances originales y ajuste de episodios aplicado una sola vez.\\
+Previsión & Mercado desde A001; objetivo observado; CSUV fuera de validación;
+mutar economía futura no altera la previsión operativa; mutar datos posteriores
+no cambia el efecto de producto estimado al origen.\\
+Simulador & Ejemplo de 286 coches; FIFO; coste de 15 días; límite de 180;
+intereses por tramos; transfers con VM; unidades enteras y balances.\\
+Integración & Mismo plan inicial; ausencia de anticipación; pedido de diciembre
+a marzo; identidades económicas; totales por réplica y ledger absoluto.\\
+Entrega & Coincidencia con tablas; documentos regenerables; legibilidad y
+estructura de Word y PowerPoint.\\\bottomrule
+\end{tabularx}
+
+Comprobar una identidad contable no demuestra que la hipótesis de demanda sea
+correcta. Por eso conviven controles de código, evaluación histórica y
+sensibilidades metodológicas: cada uno responde a un tipo diferente de error.
+
+\subsection{Qué representa este informe}
+Las tablas y figuras de \archivo{docs/report/} son una instantánea de la ejecución
+citada. Compilar LaTeX no vuelve a estimar los modelos. Las figuras vectoriales
+didácticas se dibujan en el propio documento a partir de reglas o de copias de
+resultados; no crean una segunda simulación. Si cambia el análisis, deben
+actualizarse también las cifras y las interpretaciones del informe.
+
+\section{Preguntas de repaso y errores de interpretación frecuentes}\label{anexo:repaso}
+
+\begin{enumerate}[itemsep=7pt]
+\item \textbf{¿Por qué no son iguales matriculaciones y demanda de clientes?}
+Porque las primeras incluyen automatriculaciones. Además, ni siquiera las compras
+netas identifican toda la demanda potencial cuando falta stock.
+\item \textbf{¿Puede crecer el total y caer la gama comparable?}
+Sí. CSUV incorpora clientes nuevos al perímetro de la marca aunque los segmentos
+anteriores permanezcan estables o retrocedan.
+\item \textbf{¿Por qué no se descuenta dos veces el adelanto?}
+El histórico ajustado sirve para interpretar o normalizar el ancla; el registro
+futuro se aplica una sola vez a A013. Replicar el descuento anual en cada mes
+o añadir otro efecto de caída sobre la misma cantidad duplicaría su impacto.
+\item \textbf{¿Un retraso económico de tres meses permite conocer todo A013?}
+No. Sólo parte del horizonte queda cubierta por información ya observada; para
+el resto se necesita congelación o escenarios.
+\item \textbf{¿Qué significa MAE relativo del 14,8\,\%?}
+Es el error absoluto mensual del total comparable en la evaluación retrospectiva
+A012, dividido por sus ventas observadas. No valida CSUV ni garantiza el error A013.
+\item \textbf{¿La cifra prevista es un pedido a fábrica?}
+No. Antes se descuentan inventario y compromisos, se añade el colchón y se respeta
+el plazo de llegada.
+\item \textbf{¿95\,\% de servicio significa un 95\,\% de probabilidad de no tener roturas?}
+No. El objetivo es la media de la proporción anual de unidades atendidas en el
+central. Un segmento puede cumplirla y tener réplicas por debajo del umbral.
+\item \textbf{¿Las medianas de segmentos suman la mediana del total?}
+No necesariamente. Hay que sumar segmentos dentro de cada réplica y calcular
+después el percentil del total.
+\item \textbf{¿Toda venta perdida es una pérdida económica positiva?}
+No. La venta adicional también habría soportado sus costes. Si la contribución
+marginal es negativa, perder esa operación no equivale a perder un margen positivo.
+\item \textbf{¿Más réplicas resuelven la incertidumbre de un arancel supuesto?}
+No. Reducen ruido de Monte Carlo bajo ese arancel. Para estudiar otro tamaño
+hay que cambiar el supuesto y comparar una sensibilidad.
+\item \textbf{¿La mejor política evaluada es el óptimo global?}
+No. Es la mejor dentro de la malla y del objetivo acordados, bajo las restricciones
+y aproximaciones representadas.
+\item \textbf{¿Qué dato vigilarías primero en A013?}
+Ventas respecto a previsión, disponibilidad efectiva y compromisos; junto con
+confirmación de costes, lanzamientos e interrupciones. Ninguna señal debe
+interpretarse sin las restricciones que pueden estar ocultando demanda.
+\end{enumerate}

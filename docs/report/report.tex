@@ -1,0 +1,188 @@
+\documentclass[11pt,a4paper,twoside]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-tabla,es-nodecimaldot,es-noshorthands]{babel}
+\spanishplainpercent
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[a4paper,inner=23mm,outer=23mm,top=23mm,bottom=23mm,headheight=14pt,headsep=8mm]{geometry}
+\usepackage{setspace}
+\setstretch{1.10}
+\raggedbottom
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{graphicx}
+\graphicspath{{figuras/}}
+\usepackage[table]{xcolor}
+\definecolor{azul}{HTML}{0072B2}
+\definecolor{optimista}{HTML}{009E73}
+\definecolor{pesimista}{HTML}{D55E00}
+\definecolor{tinta}{HTML}{252A30}
+\definecolor{gris}{HTML}{60666D}
+\definecolor{fondo}{HTML}{F1F5F8}
+\color{tinta}
+\usepackage{booktabs,tabularx,longtable,array,makecell,multirow}
+\renewcommand{\arraystretch}{1.16}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\usepackage{siunitx}
+\sisetup{output-decimal-marker={,},group-separator={.},group-minimum-digits=4}
+\usepackage{eurosym}
+\usepackage{enumitem}
+\setlist{nosep,leftmargin=*,topsep=4pt}
+\usepackage{caption,subcaption}
+\captionsetup{font=small,labelfont=bf,labelsep=period,justification=justified,singlelinecheck=false}
+\captionsetup[table]{position=top,skip=6pt}
+\usepackage{float,placeins,pdflscape}
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries}{\thesection.}{.65em}{}
+\titleformat{\subsection}{\large\bfseries}{\thesubsection.}{.65em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries}{\thesubsubsection.}{.65em}{}
+\titlespacing*{\section}{0pt}{20pt plus 3pt minus 2pt}{9pt}
+\titlespacing*{\subsection}{0pt}{14pt plus 2pt}{6pt}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\small\thepage}
+\fancyhead[LO]{\small\color{gris}Kaido Motors España · Guía del proceso}
+\fancyhead[RE]{\small\color{gris}\nouppercase{\leftmark}}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\sectionmark}[1]{\markboth{\thesection.\ #1}{}}
+\usepackage[skins]{tcolorbox}
+\newtcolorbox{idea}[1]{enhanced,colback=fondo,colframe=gris!35,
+  boxrule=.4pt,arc=0pt,left=9pt,right=9pt,top=7pt,bottom=7pt,
+  title={#1},colbacktitle=fondo,coltitle=tinta,fonttitle=\bfseries,
+  titlerule=0pt,before skip=10pt,after skip=10pt}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc}
+\usepackage{pgfplots,pgfplotstable}
+\pgfplotsset{compat=1.18,every axis/.append style={
+  font=\small,axis line style={gris!60},tick style={gris!60},
+  grid=major,grid style={gris!14},axis lines=left,
+  legend style={draw=none,fill=white,font=\small},
+  label style={font=\small},title style={font=\normalsize\bfseries}}}
+\usepackage{xurl}
+\usepackage[unicode,colorlinks=true,linkcolor=azul,citecolor=azul,urlcolor=azul,
+  pdftitle={Kaido Motors España: guía razonada del proceso y los resultados},
+  pdfauthor={Proyecto Kaido Motors},pdfsubject={Simulación de Sistemas Logísticos}]{hyperref}
+\usepackage{bookmark}
+\urlstyle{tt}
+\newcommand{\archivo}[1]{\nolinkurl{#1}}
+\newcommand{\fuente}[1]{\par\smallskip{\footnotesize\color{gris}\textit{Fuente:} #1.\par}}
+\newcommand{\unidad}[1]{\,\text{#1}}
+\newcommand{\MEE}{\text{M\euro}}
+\newcommand{\paso}[1]{\paragraph{#1}}
+\newcommand{\tabla}[4]{%
+  \begin{table}[htbp]\centering\caption{#2}\label{#3}
+  {\small\input{tablas/#1}}\fuente{#4}\end{table}}
+\newcommand{\grafica}[4]{%
+  \begin{figure}[htbp]\centering
+  \includegraphics[width=\linewidth,height=.65\textheight,keepaspectratio]{#1}
+  \caption{#2}\label{#3}\fuente{#4}\end{figure}}
+\newcommand{\grafosanchos}[5][]{%
+  \clearpage\begin{landscape}\thispagestyle{plain}
+  \begin{figure}[p]\centering\includegraphics[width=.96\linewidth]{#2}
+  \caption{#3}\label{#4}\fuente{#5}
+  \if\relax\detokenize{#1}\relax\else
+    \medskip\begin{minipage}{.94\linewidth}\small #1\end{minipage}
+  \fi\end{figure}
+  \end{landscape}\clearpage}
+\setcounter{tocdepth}{2}
+\setlength{\parindent}{1.25em}
+\setlength{\parskip}{3pt plus 1pt}
+\setlength{\emergencystretch}{2em}
+\widowpenalty=10000
+\clubpenalty=10000
+\renewcommand{\topfraction}{.88}
+\renewcommand{\bottomfraction}{.8}
+\renewcommand{\textfraction}{.1}
+\renewcommand{\floatpagefraction}{.7}
+
+\begin{document}
+\thispagestyle{empty}
+\begin{center}
+  \vspace*{4mm}
+  \includegraphics[width=4.2cm]{logo-uax.png}\par
+  \vspace{9mm}
+  {\scshape Simulación de Sistemas Logísticos}\par
+  \vspace{6mm}
+  {\LARGE\bfseries Kaido Motors España}\par
+  \vspace{3mm}
+  {\Large Demanda, stock y beneficio}\par
+  \vspace{7mm}
+  {\large\color{azul}Guía razonada del proceso y los resultados}\par
+  \vspace{7mm}
+  {Universidad Alfonso X el Sabio}\par
+  {\small Ejecución de referencia: 10 de octubre de 2026}\par
+\end{center}
+\vspace{7mm}
+
+\noindent\textbf{Resumen.}
+Este informe explica cómo se transforma el histórico de Kaido Motors en una
+propuesta de pedidos para A013. Presenta la preparación de datos, la separación
+entre matriculaciones y compras de clientes, la previsión de mercado, la
+simulación mensual con stock de distintas edades y la elección de una política
+de abastecimiento. Cada fase conecta la pregunta de negocio con su método,
+sus resultados y sus límites. Las tablas proceden de la ejecución revisada de
+los cuatro notebooks del proyecto; las cifras de escenarios son condicionales
+a sus supuestos y no tienen probabilidades asignadas.
+
+\medskip
+\noindent\textbf{Palabras clave:} demanda de clientes · validación temporal ·
+stock de seguridad · FIFO · Monte Carlo · contribución económica.
+
+\begin{idea}{Cómo utilizar este documento}
+Para comprender el conjunto, leer las secciones~\ref{sec:mapa} y
+\ref{sec:lectura-final}. Para reproducir el razonamiento, seguir las cuatro
+fases en orden. Las ecuaciones incluyen la interpretación de sus símbolos;
+los ejemplos pequeños permiten comprobar una cuenta antes de pasar a las
+tablas reales. Los anexos reúnen planes mensuales, resultados por segmento y
+preguntas de repaso.
+\end{idea}
+
+\vfill
+\noindent\footnotesize
+\textbf{Referencia docente.} Caso original elaborado por Jacinto Velasco y
+Javier Goikoetxea. Profesor: Javier Goikoetxea. Este documento es una explicación
+de la solución desarrollada en el proyecto; no es el enunciado ni se atribuye su
+autoría a los autores del caso. Los datos y nombres están camuflados. Material de
+uso exclusivamente docente, sujeto a las condiciones del enunciado.
+\normalsize
+\clearpage
+\tableofcontents
+\clearpage
+
+\input{secciones/01_mapa}
+\input{secciones/02_datos}
+\input{secciones/03_demanda}
+\input{secciones/04_simulacion}
+\input{secciones/05_escenarios}
+\input{secciones/06_resultados}
+\input{secciones/07_anexos}
+
+\clearpage
+\begin{thebibliography}{9}
+\addcontentsline{toc}{section}{Referencias y trazabilidad}
+\bibitem{caso} J. Velasco y J. Goikoetxea.
+\emph{Kaido Motors España: demanda, stock y beneficio}.
+Universidad Alfonso X el Sabio. Enunciado docente, 16 páginas.
+\archivo{docs/kaido-motors-case-study.pdf}.
+\bibitem{guia} Proyecto Kaido Motors.
+\emph{Guía del proyecto y plan aprobado de revisión del modelo}.
+\archivo{docs/guia-proyecto.md} y \archivo{docs/plan-revision-modelo.md}.
+\bibitem{datos} Proyecto Kaido Motors.
+\emph{Datos y demanda observada}. Notebook \archivo{datos.ipynb};
+salidas en \archivo{resultados/datos/}.
+\bibitem{demanda} Proyecto Kaido Motors.
+\emph{Previsión de clientes y escenarios A013}. Notebook \archivo{demanda.ipynb};
+salidas en \archivo{resultados/demanda/}.
+\bibitem{simulacion} Proyecto Kaido Motors.
+\emph{Simulación logística A013}. Notebook \archivo{simulacion.ipynb};
+salidas en \archivo{resultados/simulacion/}.
+\bibitem{escenarios} Proyecto Kaido Motors.
+\emph{Escenarios y recomendación A013}. Notebook \archivo{escenarios.ipynb};
+salidas en \archivo{resultados/escenarios/}.
+\bibitem{configuracion} Proyecto Kaido Motors.
+\emph{Configuración de la ejecución revisada}.
+\archivo{resultados/escenarios/tablas/configuracion_ejecucion.json}.
+\end{thebibliography}
+\end{document}

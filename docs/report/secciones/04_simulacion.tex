@@ -1,0 +1,239 @@
+\section{Tercera fase: convertir demanda en pedidos, stock y costes}\label{sec:simulacion}
+
+\begin{idea}{Entrada, trabajo y salida}
+\textbf{Entran} previsión central, stock inicial, llegadas comprometidas, errores
+de previsión y catálogo económico. \textbf{Se simula} mes a mes el movimiento
+de cohortes, las ventas, su antigüedad y las decisiones a tres meses.
+\textbf{Salen} cantidades físicamente consistentes y una cuenta económica.
+Primero se comprueba una trayectoria sin ruido; después se repite el mecanismo.
+\end{idea}
+
+\subsection{Pedido, fabricación asignada y llegada: tres fechas}
+El caso aproxima el plazo logístico por tres meses. Si $Q_{s,t}$ es el pedido
+decidido al cierre del mes $t$ y $L_{s,t+3}$ la llegada correspondiente,
+\begin{equation}\label{eq:plazo}
+ L_{s,t+3}=Q_{s,t}
+\end{equation}
+cuando no existe una interrupción. La fabricación se aproxima por la asignación
+ejecutada del pedido; no se representa una planta con su propia capacidad y
+secuencia diaria.
+
+Al cerrar diciembre de A012, enero y febrero ya están comprometidos. Marzo es
+la primera llegada modificable. Una revisión al cerrar enero modifica abril,
+no febrero ni marzo. La distinción evita instrucciones como «pedir en septiembre»
+cuando en realidad se necesita \emph{recibir} en septiembre.
+
+\begin{figure}[htbp]\centering
+\begin{tikzpicture}[x=2.15cm,y=1cm,font=\small,>=Stealth]
+\foreach \x/\mes in {0/dic A012,1/ene A013,2/feb A013,3/mar A013,4/abr A013,5/may A013}{
+  \node at (\x,0) {\mes};\draw[gris!50] (\x,-.15)--(\x,-.3);}
+\draw[gris!50] (0,-.3)--(5,-.3);
+\draw[->,azul,thick] (0,-.65)--node[below]{decisión de diciembre: llegada en marzo}(3,-.65);
+\draw[->,azul,thick] (1,-1.5)--node[below]{revisión de enero: llegada en abril}(4,-1.5);
+\node[draw=gris!40,fill=fondo,align=center,text width=3.4cm] at (1.5,.9)
+  {Enero y febrero\\ya vienen en camino};
+\end{tikzpicture}
+\caption{El plazo de decisión. El stock disponible y los coches en camino no son
+la misma cantidad. Los pedidos de octubre--diciembre de A013 llegarán en A014.}
+\label{fig:plazo}\fuente{regla de la sección 7 del enunciado y API logística revisada}
+\end{figure}
+
+\subsection{Cómo se fija el estado inicial}
+El stock al final de A012 es observado: \num{2877} coches. Las llegadas de enero
+y febrero no se conocen directamente y se estiman con la media mensual de
+\emph{wholesale} de los últimos seis meses, desde que existe actividad en el
+segmento. Se redondean a enteros y se suponen iguales para ambos meses.
+
+\tabla{inicial.tex}{Estado al empezar A013. El stock es observado; el tránsito
+es estimado. Las coberturas usan la previsión mensual media A013 como denominador.}
+{tab:inicial}{\archivo{resultados/simulacion/tablas/estado_inicial_a013.csv}; total calculado con sumas}
+
+El total supuesto en camino para enero--febrero es \num{4220} coches. Por eso la
+cobertura del inventario disponible es de 1,8 meses, pero al incorporar tránsito
+sube a 4,5. No se puede usar la segunda cifra para afirmar que todos esos coches
+pueden venderse hoy. C ilustra el problema contrario: parte ya de un inventario
+alto, que limita la necesidad de pedidos aunque siga existiendo demanda.
+
+Las edades iniciales se representan con lotes de 15, 45 y 75 días; 105, 135 y
+165 días; y 210 días para el tramo superior a 180. Se conservan unidades enteras.
+Las sensibilidades desplazan las edades 15 días y comparan referencias de tránsito
+de tres o seis meses, o cantidades un 25\,\% menores o mayores.
+
+\subsection{El balance físico de un mes}
+Sin transfers, con demanda realizada $D_{s,t}$ y stock anterior $S_{s,t-1}$:
+\begin{align}
+ V^{\mathrm{red}}_{s,t}&=\min(D_{s,t},S_{s,t-1}+L_{s,t}),\\
+ S_{s,t}&=S_{s,t-1}+L_{s,t}-V^{\mathrm{red}}_{s,t}.
+\end{align}
+Las llegadas se consideran disponibles al inicio del mes y las ventas se imputan
+tras 15 días. Es una convención mensual para valorar edad y coste, no una
+simulación de cada comprador durante el día.
+
+\paso{Ejemplo pequeño.}
+Hay 20 coches y llegan 50. Si 80 clientes quieren comprar, se venden 70 de la
+red y quedan diez sin atender. Con cinco transfers directos, las ventas totales
+son 75 y se pierden cinco. El stock final de la red es cero en ambos casos:
+los transfers no deben restarse otra vez de un stock al que no se incorporaron.
+
+En la alternativa de transfer se utiliza una fracción $a$ del déficit:
+\begin{align}
+ T_{s,t}&=\left\lfloor a\,\bigl(D_{s,t}-V^{\mathrm{red}}_{s,t}\bigr)\right\rfloor,\\
+ V_{s,t}&=V^{\mathrm{red}}_{s,t}+T_{s,t},\qquad
+ P_{s,t}=D_{s,t}-V_{s,t},
+\end{align}
+con $P$ igual a ventas perdidas. El caso base usa $a=0$ porque no hay
+disponibilidad garantizada. Se contrasta $a=0{,}25$ y $a=1$ como referencia
+favorable; no se asume que los países europeos tengan siempre stock ilimitado.
+
+\subsection{Por qué FIFO cambia el resultado económico}
+El balance total no informa de la edad de los coches que se venden. FIFO
+significa que se atiende la demanda con las cohortes más antiguas primero.
+Dos políticas con el mismo stock final pueden generar gastos comerciales
+distintos si conservan edades diferentes.
+
+En cada mes se añade la cohorte nueva, se venden primero las antiguas, se
+imputa el VM de cada edad y se envejece lo que queda. Las cohortes iniciales
+mantienen sus días anteriores a enero: un coche con 170 días no recibe otros
+180 días subvencionados al cambiar de año.
+
+\subsection{Coste de almacenamiento e intereses}
+Para un coche de edad inicial $a$ que permanece otros $d$ días, el coste adicional
+de la marca es
+\begin{equation}\label{eq:coste-stock}
+ C^{\mathrm{marca}}(a,d)
+ =2\left[\min(a+d,180)-\min(a,180)\right]\unidad{\euro}.
+\end{equation}
+Así, un coche recién llegado que se vende en el mismo mes genera
+$2\times15=30$ euros. Un coche de 170 días que permanece 30 días adicionales
+genera sólo $2\times10=20$ euros. El máximo de toda su vida facturada es
+360 euros; no se extrapola el coste durante años.
+
+\begin{figure}[htbp]\centering
+\begin{tikzpicture}
+\begin{axis}[width=.88\linewidth,height=6cm,xmin=0,xmax=300,ymin=0,ymax=410,
+  xlabel={Edad total del coche (días)},ylabel={Coste acumulado de la marca (\euro)},
+  xtick={0,60,90,120,180,240,300},ytick={0,120,240,360},legend pos=south east]
+\addplot[azul,thick,domain=0:300,samples=101]{2*min(x,180)};
+\addlegendentry{Regla del caso}
+\addplot[gris,dashed] coordinates {(180,0) (180,360)};
+\end{axis}\end{tikzpicture}
+\caption{El coste de la marca se detiene a los 180 días. El gasto comercial por
+edad y los intereses del concesionario son conceptos adicionales.}
+\label{fig:coste-stock}\fuente{enunciado, sección 2.4; ecuación~\eqref{eq:coste-stock}}
+\end{figure}
+
+Los intereses del concesionario se calculan por tramos: tarifa diaria del primer
+tramo hasta el día 90, del segundo entre 91 y 180, y ningún interés adicional
+contado por el caso después. Si $c_1,c_2$ son las tarifas diarias del catálogo,
+la función acumulada es
+\begin{equation}
+ J(a)=c_1\min(a,90)+c_2\min\!\left(\max(a-90,0),90\right).
+\end{equation}
+El coste de un periodo es $J(a+d)-J(a)$. Por ejemplo, pasar de 85 a 100 días
+supone cinco días al primer tipo y diez al segundo, no quince días a ambos.
+Estos intereses se muestran separados del resultado de la marca. El vencimiento
+del crédito a los 180 días es un riesgo de liquidez para el concesionario.
+
+\subsection{Cuánto pedir y cómo dimensionar el colchón}
+Al cerrar $t$, se proyecta el stock disponible antes de la primera llegada
+modificable, usando las llegadas ya comprometidas y la previsión de $t+1$ y
+$t+2$. La implementación no permite stock proyectado negativo: una demanda que
+no se atiende no se convierte en un inventario negativo a reponer, porque el
+caso base no acumula pedidos pendientes de clientes.
+
+La regla de pedido es
+\begin{equation}\label{eq:pedido}
+ Q_{s,t}=\left\lceil\max\!\left(0,
+ \widehat D_{s,t+3}+SS_{s,t}-\widehat S_{s,t+2}\right)\right\rceil.
+\end{equation}
+El redondeo hacia arriba expresa coches enteros. $SS$ es el stock de seguridad;
+no es una reserva idéntica para todos los segmentos.
+
+La fórmula docente $z\sigma\sqrt{3}$ supone errores mensuales independientes.
+La revisión utiliza errores acumulados observados en ventanas de tres meses:
+\begin{equation}
+ \sigma_{3,s}^{\mathrm{rel}}
+ =\operatorname{sd}\left(
+ \frac{\sum_{u=t+1}^{t+3}(\widehat D_{s,u}-O_{s,u})}
+      {\sum_{u=t+1}^{t+3}\widehat D_{s,u}}\right),\qquad
+ SS_{s,t}=z_s\,\sigma_{3,s}^{\mathrm{rel}}
+                \sum_{u=t+1}^{t+3}\widehat D_{s,u}.
+\end{equation}
+Las ventanas no se unen entre años de validación distintos. El error ya está
+acumulado durante el plazo; multiplicar otra vez por $\sqrt3$ duplicaría esa
+adaptación. Se cubren los meses \emph{hasta la llegada}, no los tres posteriores
+a recibirla.
+
+\paso{Comprobación del ejemplo del enunciado.}
+Con 536 coches iniciales, 700 de llegada en enero y otros 700 en febrero,
+y previsiones 550 y 600, el stock proyectado es $536+700+700-550-600=786$.
+Con $\sigma=100$ y $z=1{,}28$, el colchón docente es aproximadamente 222 coches.
+Para una previsión de marzo de 850, resulta
+\[
+ Q=\left\lceil850+1{,}28\times100\sqrt3-786\right\rceil=286.
+\]
+El notebook comprueba este valor ejercitando el planificador, además de verificar
+balances y fronteras de coste.
+
+\subsection{Revisar sin conocer la demanda que no se atendió}
+La revisión utiliza el cociente entre las ventas y la previsión acumuladas en
+los tres últimos meses, $r$. La corrección amortiguada es
+\begin{equation}\label{eq:revision}
+ f=\max\bigl(0,\,1+0{,}5(r-1)\bigr).
+\end{equation}
+Si las ventas superan un 20\,\% la previsión, el factor es 1,10: se incorpora
+la mitad de la desviación para evitar reaccionar plenamente a un mes ruidoso.
+
+Si la red agotó su disponibilidad en la ventana, las ventas están censuradas
+por falta de coches. En ese caso el factor no se reduce por debajo de uno.
+El planificador observa ventas y disponibilidad, no utiliza mágicamente la
+demanda latente simulada para corregirse. El factor se aplica a las previsiones
+del plazo y sólo cambia el pedido que llegará en $t+3$.
+
+\subsection{Primero comprobar un año sin ruido}
+La referencia determinista utiliza la previsión central redondeada al entero
+más próximo, con $z=1{,}28$. No es todavía la política recomendada ni una media
+de mil simulaciones.
+
+\subsubsection*{Un recorrido real: SSUV en el primer trimestre}
+\begin{table}[H]\centering
+\caption{Primer trimestre SSUV de la referencia determinista, coches.}
+\begin{tabular}{@{}lrrrrrr@{}}\toprule
+Mes & \makecell{Stock\\inicial} & Llegadas & Demanda & Ventas & Pérdidas & \makecell{Stock\\final} \\\midrule
+Enero & 0 & 390 & 369 & 369 & 0 & 21 \\
+Febrero & 21 & 390 & 500 & 411 & 89 & 0 \\
+Marzo & 0 & 1.420 & 591 & 591 & 0 & 829 \\\bottomrule
+\end{tabular}
+\fuente{\archivo{resultados/simulacion/tablas/simulacion_central_mensual_a013.csv}}
+\end{table}
+
+En enero, $0+390-369=21$ coches quedan en stock. En febrero sólo hay
+$21+390=411$ para una demanda de 500, de modo que se pierden 89 compras.
+La llegada de marzo todavía no está disponible para esos clientes. Al llegar
+los \num{1420} coches de marzo, la demanda es 591 y quedan 829 de protección;
+las compras perdidas de febrero no se convierten en pedidos pendientes.
+
+El coste de enero también puede comprobarse a mano: 369 coches vendidos con
+15 días y 21 que permanecen 31 días generan
+$369\times15\times2+21\times31\times2=\num{12372}$ euros. La convención mensual
+es la misma que se usa después en todas las réplicas aleatorias.
+
+\tabla{determinista.tex}{Referencia determinista A013: demanda central sin ruido,
+colchón uniforme $z=1{,}28$. Resultado tras costes modelizados.}
+{tab:determinista}{\archivo{resultados/simulacion/tablas/resumen_central_a013.csv}}
+
+Atiende \num{18991} coches y deja \num{89} sin atender, todos en SSUV.
+La contribución es 64,18 M\euro{} y el stock final, \num{2319}. Tener prevista
+la demanda no elimina las restricciones iniciales: en SSUV se parte de stock
+cero y las dos primeras llegadas ya están comprometidas.
+
+\FloatBarrier
+\grafosanchos[\textbf{Antes de añadir azar.} Se verifican balances y unidades
+enteras, FIFO y VM por edad, los 15 días de una venta nueva, el límite de 180 días,
+intereses por tramos, transfers, ausencia de anticipación y el pedido de diciembre
+que llega en marzo A014. Repetir una simulación no corrige un mecanismo mal definido.]
+{stock_central_a013_a014.png}
+{Referencia determinista y prolongación hasta junio de A014. El punto gris es
+stock inicial observado; el trazo azul, stock simulado. La línea vertical separa
+A013 de la sensibilidad de continuidad, que no es una previsión validada.}
+{fig:simulacion}{\archivo{simulacion.ipynb}; política base, escalas por segmento}

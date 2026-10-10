@@ -1,0 +1,8 @@
+segmento,z,viable,servicio_piloto,factible_piloto,criterio,z_piloto,servicio_central,p10_servicio,prob_servicio_inferior_95,objetivo_verificado
+B,0.84,True,0.9652429912499372,True,margen con servicio; menor z dentro de 2 EE emparejados,0.84,0.9649774784220179,0.8955703527255521,0.271,True
+C,1.65,True,0.9954305423371492,True,margen con servicio; menor z dentro de 2 EE emparejados,1.65,0.9961717223470102,0.9867243198204554,0.019,True
+MD,3.0,True,0.9962376490660898,True,margen con servicio; menor z dentro de 2 EE emparejados,3.0,0.9965217004415482,0.9899239254083042,0.017,True
+SSUV,0.84,True,0.9576014039610176,True,margen con servicio; menor z dentro de 2 EE emparejados,0.84,0.953572637440957,0.8927427635746203,0.391,True
+CSUV,1.28,True,0.9821639502730146,True,margen con servicio; menor z dentro de 2 EE emparejados,1.28,0.9834383516748003,0.9310707734999762,0.13,True
+MSUV,1.65,True,0.9917904899284927,True,margen con servicio; menor z dentro de 2 EE emparejados,1.65,0.9922317087686005,0.9713076290104278,0.05,True
+S,0.84,True,0.9676974660944687,True,margen con servicio; menor z dentro de 2 EE emparejados,0.84,0.9596958850382549,0.8550832234156146,0.223,True

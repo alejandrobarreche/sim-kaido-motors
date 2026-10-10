@@ -1,0 +1,222 @@
+\section{Leer los resultados y convertirlos en una recomendación}\label{sec:lectura-final}
+
+\subsection{Antes de sumar euros: qué cuenta cada concepto}
+El catálogo separa beneficio bruto de la marca, VM y CVP. En la simulación,
+el VM depende de la edad del coche vendido:
+\begin{align}
+ \mathrm{CVP}&=\mathrm{beneficio\ bruto}-\mathrm{VM},\\
+ R&=\mathrm{CVP}-C_{\mathrm{stock}}-C_{\mathrm{transfer}}
+       -C_{\mathrm{CO_2}}-C_{\mathrm{arancel}}-C_{\mathrm{cambio}}.
+\end{align}
+$R$ es contribución después de los costes modelizados, no beneficio neto contable
+de una empresa con todos sus gastos generales. Un coste de cambio negativo
+representa un ahorro y, al restarlo, aumenta el resultado.
+
+No se vuelve a restar VM después de calcular CVP. Tampoco se descuentan otra vez
+las ventas perdidas: sus ingresos ya no forman parte de las ventas realizadas.
+El coste de oportunidad se informa aparte. Los aranceles y el cambio adicional
+se imputan a las ventas de cohortes de nueva importación; el coste incremental
+que permanece en el stock final se registra, pero no se convierte en ingreso.
+
+\tabla{unidad.tex}{Economía de una unidad joven por segmento, antes de stock y
+otros recargos. Todos los importes son euros por coche; el coste de transfer
+es el 20\,\% del beneficio bruto, no del CVP.}
+{tab:unidad}{\archivo{resultados/escenarios/tablas/economia_unitaria_segmento.csv}}
+
+Un MSUV joven deja \num{5887} euros de CVP antes de costes logísticos; mantener
+un coche nuevo 15 días cuesta 30 euros. No es una comparación que pueda
+extenderse sin límite: el gasto de stock de la marca se detiene en 360 euros y
+el VM de una unidad vieja puede ser diferente.
+
+En B el CVP joven es sólo 125 euros antes de stock, frente a una prima CO$_2$
+de \num{2555}. En C, el CVP joven de \num{1367} pasa a $-585$ euros al cargar
+CO$_2$, antes de arancel y stock. Una venta adicional no siempre mejora la
+contribución. Por eso, una vez confirmados los costes del escenario, se frenan
+\emph{nuevas reposiciones} marginalmente negativas. No se deja de vender
+automáticamente el inventario ya comprometido.
+
+\subsection{Resultado agregado de la política recomendada}
+La tabla~\ref{tab:resultado} utiliza medias de 1.000 réplicas. En particular,
+\emph{pedidos A013} cuenta decisiones de ese año, mientras \emph{llegadas}
+incluye coches comprometidos en A012. No tienen por qué coincidir.
+
+\tabla{resultados.tex}{Política recomendada: resultados medios A013, total de la
+marca. Las coberturas usan demanda mensual media de cada réplica.}
+{tab:resultado}{\archivo{resultados/escenarios/tablas/tabla5_plan_recomendado_a013.csv}}
+
+\paso{Central.}
+Se simulan unas \num{18539} ventas, \num{478} compras perdidas y un servicio
+medio del 97,6\,\%. La contribución media es 62,88 M\euro{}. El stock final
+medio es \num{2221} coches. La demanda media simulada de \num{19017} no tiene
+por qué igualar exactamente la previsión puntual de \num{19077}: procede de
+una muestra finita de trayectorias y del redondeo a unidades.
+
+\paso{Pesimista.}
+La contribución cae a 3,09 M\euro{} y el servicio al 77,8\,\%. No se debe sólo
+a una demanda menor. CO$_2$ y el recargo de importación hacen negativas nuevas
+reposiciones de B, C, SSUV y S bajo la regla marginal, y se incorpora la
+interrupción de suministro. El deterioro de servicio es una consecuencia
+importante de la política económica, no una cifra que pueda ocultarse con el
+cumplimiento del central.
+
+\paso{Optimista.}
+Se simulan unas \num{24952} ventas y 91,37 M\euro{} de contribución media.
+Sin embargo, se pierden unas \num{3493} compras: la demanda mejora más deprisa
+que la capacidad de modificar llegadas. El ahorro de divisa, registrado como
+coste negativo, explica que la contribución final pueda superar el CVP antes
+de esos ajustes. No se han restado los costes dos veces ni creado ventas extra.
+
+\tabla{riesgo.tex}{Dispersión del resultado total y del servicio anual.
+P10--P90 describe variación dentro del escenario, no probabilidades de escenarios.}
+{tab:riesgo}{\archivo{resultados/escenarios/tablas/tabla5_plan_recomendado_a013.csv}}
+
+El central tiene P10--P90 de contribución de 56,45--69,47 M\euro{}. Es un rango
+condicionado a los supuestos y a la distribución de errores elegida. El error
+estándar de su media de Monte Carlo es aproximadamente 0,159 M\euro{}, una
+medida de precisión de simulación que no equivale a ese rango de resultados.
+No observar pérdidas en las 1.000 réplicas finales no demuestra que su
+probabilidad real sea cero.
+
+\grafica{plan_recomendado_ventas_stock_a013.png}
+{Ventas y stock del plan recomendado: mediana y P10--P90 por escenario.
+Las bandas reflejan variación mensual de una misma política inicial y sus
+revisiones. El stock representado no incluye coches en camino.}
+{fig:resultado-mensual}{\archivo{escenarios.ipynb}; 1.000 réplicas por escenario}
+
+\subsection{No todos los segmentos desempeñan el mismo papel}
+\tabla{segmentos.tex}{Resultado central por segmento: medias de demanda, ventas,
+contribución, stock final y servicio. Las sumas pueden diferir por redondeo.}
+{tab:segmentos}{\archivo{resultados/escenarios/tablas/tabla5_plan_recomendado_a013.csv}}
+
+MSUV aporta aproximadamente 31,91 M\euro{}, cerca de la mitad del resultado
+central. SSUV y CSUV aportan 14,86 y 11,77 M\euro{}, respectivamente. La
+disponibilidad de esos segmentos tiene más impacto absoluto que una mejora
+pequeña en un segmento de bajo volumen.
+
+B apenas aporta 0,02 M\euro{} en el central: mantener su objetivo de servicio
+no convierte su economía en robusta. C conserva un inventario inicial elevado;
+una cobertura alta no justifica encargar más coches. S combina bajo volumen,
+alta dispersión relativa y stock medio elevado frente a la demanda. Su cobertura
+debe leerse como señal de exposición, no como garantía de calidad de previsión.
+
+\subsection{Aislar el CO\texorpdfstring{$_2$}{2} sin confundir escenarios}
+Para medir únicamente la prima, se toman las mismas ventas y flujos centrales
+y se resta la prima del catálogo a cada venta. No se reoptimiza la política
+en esta comparación.
+
+\tabla{co2.tex}{Prima CO$_2$ aislada sobre los mismos flujos centrales.
+Importes en M\euro{}; efecto negativo significa reducción del resultado.}
+{tab:co2}{\archivo{resultados/escenarios/tablas/efecto_co2_aislado_a013.csv}}
+
+La reducción media aislada es 55,01 M\euro{}, dejando 7,87 M\euro{} sobre esos
+mismos flujos. El pesimista completo da 3,09 M\euro{} porque también cambia
+el volumen servido, los pedidos, los aranceles y el suministro. No sería
+correcto atribuir toda la diferencia central--pesimista a CO$_2$.
+
+\subsection{Qué significa equivocarse por arriba o por abajo}
+\begin{description}[style=nextline]
+\item[Pasarse.] El exceso inmoviliza stock, consume días de coste y puede exigir
+más VM al venderse viejo. La comparación debe considerar los costes posteriores
+del inventario final, no sólo diciembre.
+\item[Quedarse corto.] Se pierde la contribución de una venta potencial o se
+incurre en el coste de conseguir un transfer. El margen no obtenido debe
+descontar también CO$_2$, arancel y otros costes que no se pagan al no vender.
+Puede resultar negativo en una venta marginal inviable.
+\end{description}
+El simulador no calcula un presupuesto de publicidad óptimo ni una respuesta de
+demanda a cada euro de descuento. «Empujar» un segmento significa aquí priorizar
+abastecimiento o revisar su política comercial, no asegurar que cualquier campaña
+adicional sea rentable.
+
+\subsection{La sensibilidad: comprobar qué hipótesis sostiene la decisión}
+Las pruebas cambian un supuesto cada vez y utilizan las mismas 200 réplicas del
+piloto. Por tanto, no hay que comparar mecánicamente sus importes con la media
+final de 1.000 réplicas. La referencia central de la política final con esas
+200 réplicas es 63,41 M\euro{}, frente a 62,88 M\euro{} con 1.000.
+
+\begin{table}[htbp]\centering
+\caption{Ejemplos de sensibilidad, 200 réplicas comunes.
+Los importes son medias condicionales A013 y no se comparan con otra muestra.}
+\label{tab:sensibilidad}
+\begin{tabularx}{\linewidth}{@{}Yrr@{}}\toprule
+Prueba & \makecell{Resultado\\(M\euro)} & \makecell{Servicio\\medio (\%)} \\\midrule
+Central: referencia de las mismas 200 réplicas & 63,41 & 97,7 \\
+Central: transfer del 25\,\% del déficit & 63,63 & 98,3 \\
+Central: transfer suficiente, cota favorable & 64,29 & 100,0 \\
+Pesimista: sin arancel adicional & 7,78 & 78,1 \\
+Pesimista: arancel de 1.000 \euro/coche & $-1{,}50$ & 78,0 \\
+Pesimista: no frenar reposición negativa & $-0{,}55$ & 98,6 \\
+Central: demanda CSUV un 25\,\% menor & 60,34 & 97,9 \\
+Central: demanda CSUV un 25\,\% mayor & 66,32 & 97,3 \\\bottomrule
+\end{tabularx}
+\fuente{\archivo{resultados/escenarios/tablas/sensibilidades_plan_recomendado.csv};
+referencia central a partir del piloto y los $z$ seleccionados}
+\end{table}
+
+El ejemplo del arancel muestra una incertidumbre de supuestos que no aparece
+en la banda aleatoria del escenario base: con otro recargo, el pesimista puede
+tener contribución negativa. La alternativa sin freno económico mejora el
+servicio, pero pierde dinero. Es un conflicto de objetivos que debe comunicarse.
+
+Las pruebas también cubren llegadas iniciales, edades, VM de CSUV viejo,
+correlaciones, efecto de producto, dispersión de CSUV, sesgo residual y nivel
+de continuidad A014. No se les asignan probabilidades.
+
+\subsection{Por qué se prolonga el análisis más allá de diciembre}
+Los pedidos de octubre--diciembre de A013 llegan en enero--marzo de A014.
+No seguirlos puede premiar una política que mejora artificialmente el cierre y
+desabastece el trimestre siguiente.
+
+La prolongación conserva el nivel desestacionalizado del último trimestre y el
+perfil mensual de mercado A009--A010. No repite el adelanto o el lanzamiento en
+cada enero. Al no conocerse el calendario ni la economía A014, se presenta como
+sensibilidad de continuidad y se compara también un nivel un 10\,\% menor o mayor.
+
+\tabla{continuidad.tex}{Comparación del plan base y recomendado al extender
+hasta junio de A014. Resultado medio tras costes modelizados.}
+{tab:continuidad}{\archivo{resultados/escenarios/tablas/comparacion_continuidad_politicas.csv}}
+
+La mejora frente al plan base se mantiene bajo esa continuidad: el central
+recomendado acumula 93,00 M\euro{} en 18 meses frente a 92,66 M\euro{} del base.
+No se añade un precio de venta ficticio por todo el stock que queda ni se
+demuestra con ello un óptimo de horizonte infinito.
+
+\subsection{La recomendación operativa, expresada correctamente}
+\begin{enumerate}
+\item \textbf{Partir del plan central y los colchones seleccionados.} El plan
+inicial asigna \num{16144} coches a pedidos decididos en A013 y prevé
+\num{18114} llegadas en A013; son flujos distintos. Los anexos muestran mes de
+decisión y mes de recepción.
+\item \textbf{Revisar mensualmente sólo lo modificable.} Los pedidos realmente
+ejecutados después de observar ventas no tienen por qué sumar lo mismo que el
+plan inicial. En el central su media es de unos \num{15756} coches.
+\item \textbf{Vigilar segmentos, no sólo el total.} Priorizar la disponibilidad
+de los segmentos de mayor contribución; vigilar especialmente la incertidumbre
+de CSUV, el stock de C y la fragilidad económica de B.
+\item \textbf{Separar señales comerciales y restricciones físicas.} Un descenso
+de ventas con la red agotada no demuestra menor demanda. Un nuevo coste confirmado
+puede justificar frenar pedidos aunque exista demanda.
+\item \textbf{Revisar las hipótesis que dominan el resultado.} Disponibilidad de
+transfers, aranceles, prima CO$_2$, fechas de producto y tamaño del adelanto no
+deben quedar escondidos en una cifra final.
+\end{enumerate}
+
+\tabla{revision.tex}{Umbrales orientativos del cociente de sumas de tres meses:
+ventas observadas / previsión. Son referencias de seguimiento, no garantías.}
+{tab:revision}{\archivo{resultados/escenarios/tablas/umbrales_revision_a013.csv}}
+
+Los percentiles se calculan sobre el mismo cociente utilizado en la regla, sin
+unir años de validación distintos. CSUV utiliza un proxy de SSUV/MSUV ampliado,
+no un umbral propio validado. El rango muy amplio de S y el rango inferior a uno
+de MD también recuerdan los errores históricos y la muestra limitada: las señales
+requieren diagnóstico, no una orden automática de aumentar o reducir producción.
+
+\begin{idea}{Respuesta global a las cinco preguntas del caso}
+Se observa crecimiento de clientes en el total de A012, distinto de la evolución
+de la gama comparable. Se obtiene una previsión A013 evaluada retrospectivamente,
+con una limitación específica para CSUV. Los escenarios muestran rango de ventas,
+stock y contribución. El plan separa pedidos de llegadas y revisa a tres meses.
+La política recomendada cumple el servicio medio central acordado y mejora la
+contribución frente al base, con supuestos y riesgos explícitos.
+\end{idea}
+\FloatBarrier

@@ -1,0 +1,195 @@
+\section{Primera fase: entender y preparar los datos}\label{sec:datos}
+
+\begin{idea}{Entrada, trabajo y salida}
+\textbf{Entran} siete CSV del profesor. \textbf{Se comprueban} claves, periodos,
+ausencias y balances; se separan clientes y automatriculaciones y se estudian los
+episodios excepcionales. \textbf{Salen} una serie mensual por segmento, un
+diagnóstico de A012 y alternativas explícitas para lo que no se observa.
+\end{idea}
+
+\subsection{Qué contiene cada fuente}
+Los ficheros no empiezan todos en el mismo año. Mercado y economía comienzan en
+A001; las ventas internas, en A003; el stock, en A009. Una fila de ventas tiene
+tres claves: mes, segmento y canal. Esto explica las \num{2520} filas:
+$10\text{ años}\times12\text{ meses}\times7\text{ segmentos}\times3\text{ canales}$.
+La tabla de stock no tiene canal, de modo que no se puede cruzar con ventas como
+si cada canal dispusiera de su propio inventario.
+
+\tabla{inventario.tex}{Datos originales disponibles y granularidad de cada fila.}
+{tab:inventario}{\archivo{data/README.md} y anexo 5 del enunciado}
+
+Los años A001--A013 son códigos del caso, no años naturales identificables. El
+contador $t$ permite ordenar los meses: diciembre de A012 es $t=144$ y enero de
+A013 es $t=145$. Las fechas sintéticas que utiliza una biblioteca no proporcionan
+el calendario laboral: días laborables y Semana Santa se leen en los CSV.
+
+\subsection{Por qué limpiar no significa cambiar los datos}
+La lectura preserva el código de modelo \archivo{NA}; no lo convierte en un
+valor ausente. Un campo vacío sí representa información no disponible. Un cero,
+en cambio, es una cantidad observada: por ejemplo, ventas nulas antes de un
+lanzamiento. Las columnas porcentuales tampoco comparten siempre escala:
+\archivo{pct_diesel} se expresa como proporción, mientras el paro se expresa en
+puntos de porcentaje.
+
+Las comprobaciones verifican que las claves no estén duplicadas, que los periodos
+sean coherentes y que las sumas y desgloses tengan sentido. Pasan los 25 controles
+de lectura y consistencia. Esto \textbf{no implica que todas las identidades
+históricas sean exactas}: las discrepancias se muestran sin alterar los originales.
+
+\paso{El balance histórico.}
+Si $S_t$ es el stock al cerrar el mes, $L_t$ la facturación a la red y $M_t$ las
+matriculaciones, el residuo es
+\begin{equation}
+ r_t=S_t-\bigl(S_{t-1}+L_t-M_t\bigr).
+\end{equation}
+En el histórico existen diferencias pequeñas y algunos casos mayores: el máximo
+absoluto es de 51 coches en SSUV y de 8 en MD. En MSUV el máximo es 5; en CSUV,
+cero. Se mantienen las discrepancias, con localización en las tablas de diagnóstico.
+No se fuerza el residuo a cero para mejorar el aspecto de los datos.
+
+\fuente{\archivo{resultados/datos/tablas/balance_stock_segmento.csv}}
+
+Es importante usar aquí matriculaciones y no sustituirlas por ventas netas. Las
+automatriculaciones forman parte de las salidas registradas en el balance
+histórico. Si se retiran sólo de las salidas y no se cambia el sistema de
+contabilidad del stock, se introduce un descuadre artificial.
+
+\subsection{De matriculaciones a compras observadas de clientes}
+Para cada mes y segmento se define
+\begin{equation}\label{eq:neto}
+ O_{s,t}=M_{s,t}-A_{s,t},
+\end{equation}
+donde $O$ son las compras observadas de clientes, $M$ las matriculaciones y $A$
+las automatriculaciones; todas las cantidades se expresan en coches. Las ventas
+especiales no se restan automáticamente: una venta a una empresa puede ser una
+compra real de un cliente.
+
+En A012 se registran \num{23175} matriculaciones y \num{2469}
+automatriculaciones. Por tanto, se observan \num{20706} compras de clientes.
+En A011 se observan \num{19543}. La variación es
+\begin{equation}
+ g_{\mathrm{observado}}=
+ \frac{\num{20706}}{\num{19543}}-1\simeq 6{,}0\,\%.
+\end{equation}
+La serie resultante sigue sin ser toda la demanda potencial. Puede incluir
+compras adelantadas y puede estar limitada por falta de coches.
+
+\subsection{El lanzamiento de CSUV cambia la comparación}
+CSUV empieza a venderse en agosto de A012 y aporta \num{1192} clientes ese año.
+Son clientes reales y pertenecen al total de Kaido. Al excluirlos queda una gama
+comparable con \num{19514} clientes, prácticamente estable frente a A011:
+$-0{,}1\,\%$.
+
+No hay contradicción entre que crezca la marca y no crezca su gama anterior. Son
+dos preguntas distintas: cuánto vende el conjunto y cómo evoluciona el perímetro
+de productos que ya existía.
+
+\tabla{crecimiento.tex}{Crecimiento observado y ajuste parcial de episodios.
+Los valores ajustados son estimaciones, no recuentos de clientes identificados.}
+{tab:crecimiento}{\archivo{resultados/datos/tablas/crecimiento_demanda_a012.csv}}
+
+\grafica{crecimiento_demanda_observado_ajustado_a012.png}
+{A012 frente a A011: la conclusión depende de mantener el perímetro de comparación.
+El total incluye CSUV; el ajuste central trata episodios, pero no identifica toda
+la demanda potencial.}
+{fig:crecimiento}{\archivo{datos.ipynb}, gráfico de crecimiento observado y ajustado}
+
+\subsection{Cómo se identifican las compras adelantadas}
+Una compra adelantada cambia de fecha; no crea necesariamente un cliente nuevo.
+Los indicadores del caso señalan un episodio en agosto de A011, seguido de caída
+en septiembre--diciembre, y otro en noviembre--diciembre de A012.
+
+Para estimar el exceso se utilizan A009 y A010 como referencias estacionales.
+Cada referencia se escala \emph{por separado} al nivel observado antes del
+episodio del año que se estudia. Para una referencia $r$, un segmento $s$ y un
+año $a$, la cuenta conceptual es
+\begin{align}
+ k_{s,a,r}&=\frac{\text{clientes antes del episodio en }a}
+                  {\text{clientes en los mismos meses de }r},\\
+ E_{s,a,r}&=\max\!\left(0,\ \text{clientes en meses del episodio de }a
+                 -k_{s,a,r}\,\text{clientes en esos meses de }r\right).
+\end{align}
+El mínimo y máximo proceden de esas dos referencias y el central es su punto
+medio. El recorte a cero evita atribuir un adelanto negativo; también recuerda que
+la estimación es una regla de identificación, no una observación directa.
+
+\tabla{adelantos.tex}{Exceso estimado en los episodios y compensación posterior.
+La amplitud es sensibilidad a referencias, no un intervalo estadístico.}
+{tab:adelantos}{\archivo{resultados/datos/tablas/adelantos_a011_a012.csv}}
+
+\paso{A011: estudiar el pico y la caída conjuntamente.}
+Se estiman \num{450.4} coches de exceso y \num{257.3} de caída posterior
+compensatoria, limitada al exceso del segmento. La estimación anual ajustada es
+\begin{equation}
+ \num{19543}-\num{450.4}+\num{257.3}\simeq\num{19349.9}.
+\end{equation}
+El saldo no compensado no demuestra que esas compras se tomaran de A012: el
+episodio fue en agosto y la referencia estacional es imperfecta. Por eso no se
+convierte automáticamente en una transferencia cierta al año siguiente.
+
+\paso{A012: registrar una sola devolución hacia A013.}
+El exceso central de cierre se estima en \num{878.4} coches. Al restarlo una
+sola vez se obtienen \num{19827.6} compras ajustadas en A012. Comparadas con
+las \num{19349.9} ajustadas de A011, implican un aumento parcial del 2,5\,\%.
+
+El registro mensual reparte el ajuste anual entre los meses del episodio. No
+resta el exceso anual completo en cada mes. La misma magnitud alimentará después
+la caída supuesta en A013: retirar la anomalía del histórico y representar su
+devolución futura cumplen funciones diferentes, pero no deben generar dos
+descuentos sobre la misma previsión futura.
+
+\paso{Por qué CSUV necesita otro tratamiento.}
+No existe una historia de ventas propias anterior a su lanzamiento. Se utiliza
+como proxy el exceso de su mercado en noviembre--diciembre respecto a referencias
+escaladas, aplicado a las compras de clientes del segmento. En esta ejecución no
+se detecta un exceso positivo con ese método. Es un resultado del proxy, no una
+demostración de que ningún comprador adelantara su compra.
+
+\subsection{Qué sabemos y qué no sabemos sobre la falta de stock}
+Una señal de stock libre bajo identifica un mes sospechoso, pero no cuenta a
+los clientes que se marcharon. Si se disponía de diez coches y se vendieron
+diez, la demanda pudo ser diez o veinte. El volumen perdido no se observa en
+esas ventas.
+
+El indicador de preparación compara el stock sin cliente con las
+matriculaciones del mes y utiliza medio mes de cobertura como umbral. No es el
+nivel de servicio futuro ni el stock de seguridad: sirve para señalar un posible
+problema de observación del histórico.
+
+Como sensibilidad se utiliza la relación entre mercado y compras de clientes
+en hasta seis meses anteriores sin señal de restricción, adelanto ni caída.
+Si esa referencia sugiere una demanda mayor, se construye
+\begin{equation}
+ O^{\mathrm{alternativa}}_{s,t}
+ =\max\!\left(O_{s,t},\frac{I_{s,t}}
+ {\operatorname{mediana}_{u<t}\bigl(I_{s,u}/O_{s,u}\bigr)}\right),
+\end{equation}
+con $I$ igual a las matriculaciones del mercado y usando sólo antecedentes
+válidos. Si no hay referencia suficiente, se conserva lo observado.
+
+La alternativa arroja un crecimiento observado ampliado del 6,8\,\% para el
+total, frente al 6,0\,\% de las compras registradas. No es una estimación
+independiente de la demanda perdida: depende de la estabilidad de esa relación
+comercial. La previsión principal se valida contra clientes \emph{observados},
+no contra una serie inventada por el propio modelo.
+
+\grafica{stock_red_antiguedad_a011_a012.png}
+{Stock observado de la red por edad. La cantidad total y la antigüedad son dos
+dimensiones distintas: reducir coches no garantiza que desaparezca primero el
+inventario problemático.}
+{fig:stock-historico}{\archivo{datos.ipynb}; stock mensual A011--A012}
+
+\begin{idea}{Qué concluye realmente la primera fase}
+Se observa crecimiento de clientes en el total y estabilidad de la gama anterior.
+El ajuste central de episodios sigue siendo positivo para el total, pero depende
+de las referencias y de la compensación de A011. La señal de stock y la historia
+breve de CSUV impiden presentar una cifra única como demanda potencial exacta.
+La política futura de cero automatriculaciones es un supuesto de negocio, no una
+corrección retroactiva de lo ocurrido.
+\end{idea}
+\FloatBarrier
+\grafosanchos{demanda_observada_segmento_a003_a012.png}
+{Compras observadas por segmento, A003--A012. Los lanzamientos y los episodios
+marcados impiden tratar todas las series como una historia homogénea. Las escalas
+son distintas para ver los patrones; no deben compararse alturas entre paneles.}
+{fig:historico-clientes}{\archivo{datos.ipynb}; serie mensual neta de automatriculaciones}

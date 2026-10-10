@@ -1,0 +1,243 @@
+\section{Segunda fase: prever la demanda y medir el error}\label{sec:prevision}
+
+\begin{idea}{Entrada, trabajo y salida}
+\textbf{Entran} clientes observados, mercado completo, economía y calendario.
+\textbf{Se comparan} cuatro modelos con cortes temporales; se revisan sesgos y
+se trata CSUV por separado. \textbf{Salen} doce previsiones por segmento,
+diagnósticos de error y parámetros que alimentan el stock de seguridad y la
+simulación aleatoria.
+\end{idea}
+
+\subsection{Por qué separar mercado y posición de Kaido}
+El punto de partida es
+\begin{equation}\label{eq:mercado-cuota}
+ \widehat D_{s,t}=\widehat I_{s,t}\,q_{s,t},
+\end{equation}
+donde $\widehat I$ es el mercado previsto, en matriculaciones, y $q$ una relación
+comercial de clientes de Kaido sobre ese mercado. Si el mercado sube pero Kaido
+pierde posición, los dos efectos pueden compensarse. Si ambos mejoran, la demanda
+propia puede crecer con fuerza.
+
+$q$ no es exactamente una cuota homogénea: en el numerador se han retirado las
+automatriculaciones de Kaido, pero no conocemos todas las de sus competidores.
+La relación sirve para predecir; su definición debe conservarse al estimar efectos
+de producto y al interpretar los resultados.
+
+La previsión utiliza el mercado desde A001, aunque la venta interna de Kaido
+comience en A003. Recortar las dos fuentes al mismo inicio perdería información
+de mercado sin una necesidad metodológica.
+
+\subsection{Los cuatro candidatos y lo que aprende cada uno}
+Se empieza con una referencia que cualquiera puede calcular: repetir el mismo
+mes del año anterior. En el ancla histórica de años cerrados se normalizan los
+episodios conocidos, retirando su exceso y restituyendo la caída estimada. Así no
+se reproduce automáticamente el pico de noviembre--diciembre de A012 en A013.
+Durante una revisión dentro del año no se utilizan ajustes calculados con el
+cierre que todavía no se conoce.
+
+Se comparan después tres modelos de mercado:
+\begin{enumerate}
+  \item Confianza del consumidor, calendario y sucesos, sin constante.
+  \item Las mismas variables, con constante o intercepto.
+  \item Confianza, paro y tipo de crédito, además de calendario y sucesos,
+  con constante.
+\end{enumerate}
+El intercepto permite un crecimiento de fondo incluso cuando las variaciones
+de los indicadores son cero. No es siempre mejor: puede arrastrar una expansión
+pasada a un año de caída. Por eso se compara mediante validación, en lugar de
+eliminarlo después de mirar el año que queremos evaluar.
+
+\subsection{La ecuación del mercado, explicada término a término}
+El modelo elegido trabaja con variación logarítmica interanual. Su forma es
+\begin{align}\label{eq:modelo-mercado}
+ y_{s,t}&=\log\!\left(\frac{I_{s,t}}{I_{s,t-12}}\right),\\
+ y_{s,t}&=\alpha+\beta_W\,\Delta_{12}\log W_t
+  +\beta_S\,\Delta_{12}H_t
+  +\beta_C\,\Delta_{12}C_{t-3}
+  +\sum_j\gamma_j\,\Delta_{12}E_{j,t}+\varepsilon_{s,t}.
+\end{align}
+Aquí $W_t$ son días laborables, $H_t$ indica Semana Santa, $C_t$ es confianza y
+$E_{j,t}$ identifica incentivo público, adelanto, caída posterior o subida de
+IVA. El operador $\Delta_{12}x_t=x_t-x_{t-12}$ compara con el mismo mes del año
+anterior. En la fase logística se utilizará $L_t$ para las llegadas de coches;
+el calendario y el flujo físico tienen símbolos diferentes.
+
+\begin{itemize}
+  \item Comparar enero con enero reduce el efecto de la estacionalidad anual.
+  \item El logaritmo permite interpretar cambios de forma proporcional; al
+  deshacerlo se multiplica el mercado del año anterior por $\exp(\widehat y)$.
+  \item Los sucesos evitan atribuir todos los picos a la economía normal.
+  \item El retraso de tres meses intenta representar información disponible
+  al decidir, pero no hace conocida toda la economía futura.
+\end{itemize}
+
+Se estima una relación común con observaciones de los segmentos. La regresión
+ponderada minimiza
+\begin{equation}
+ \sum_{s,t} w_{s,t}\bigl(y_{s,t}-\widehat y_{s,t}\bigr)^2,
+ \qquad w_{s,t}=\sqrt{I_{s,t-12}}.
+\end{equation}
+Los mercados grandes pesan más, aunque menos que proporcionalmente a su tamaño.
+Se excluyen del ajuste variaciones cuya base sea inferior a 200 coches, porque
+un denominador muy pequeño produce tasas extremadamente inestables. La regla
+no equivale a borrar esos segmentos de la entrega: reciben previsión y diagnóstico.
+
+\subsection{Qué significa respetar la información disponible}
+Supongamos que estamos al cerrar A011. El fichero contiene toda la economía
+A012, pero no está permitido usarla en una previsión operativa realizada en
+esa fecha. Para un indicador retrasado, el origen máximo que puede consultarse es
+\begin{equation}
+ \text{mes económico utilizado}=\min(t-3,\,t_0),
+\end{equation}
+siendo $t_0$ el cierre de información. Si el dato necesario todavía no se conoce,
+se mantiene el último disponible en el central o se introduce la trayectoria
+supuestamente definida para un escenario.
+
+El calendario sí se conoce. Los sucesos futuros de las evaluaciones operativas
+se fijan en cero; otra evaluación, claramente separada, utiliza economía y
+sucesos reales y se denomina \emph{condicionada}. No puede presentarse como el
+rendimiento alcanzable sin conocer el futuro.
+
+\subsection{Cómo se selecciona el modelo sin utilizar A012}
+Se hacen tres ejercicios de doce meses:
+\begin{center}
+\begin{tabular}{@{}lll@{}}\toprule
+Información hasta & Periodo previsto & Función \\\midrule
+A008, $t_0=96$ & A009 & Selección \\
+A009, $t_0=108$ & A010 & Selección \\
+A010, $t_0=120$ & A011 & Selección y contraste de sesgo \\
+A011, $t_0=132$ & A012 & Evaluación retrospectiva separada \\\bottomrule
+\end{tabular}
+\end{center}
+
+Para elegir se utiliza WAPE, calculado sobre todos los meses y los seis segmentos
+validables:
+\begin{equation}\label{eq:wape}
+ \mathrm{WAPE}=\frac{\sum_{s,t}|\widehat D_{s,t}-O_{s,t}|}
+                         {\sum_{s,t}O_{s,t}}.
+\end{equation}
+CSUV no participa porque no posee historia comparable. Se elige el candidato con
+menor WAPE; la referencia más sencilla tiene prioridad en un empate.
+
+\tabla{seleccion.tex}{Comparación de candidatos con A009--A011, antes de A012.}
+{tab:seleccion}{\archivo{resultados/demanda/tablas/seleccion_a009_a011.csv}}
+
+Gana el modelo con confianza e intercepto, con WAPE del 23,8\,\%. No significa
+que todos los segmentos tengan ese error ni que sea un error futuro garantizado.
+Se trata de una comparación entre cuatro alternativas bajo el protocolo definido.
+
+\subsection{Por qué el sesgo se estudia aparte del error}
+El error se define como previsión menos observado. Un sesgo positivo significa
+que se prevé demasiado; uno negativo, que se prevé poco. Dos modelos pueden
+tener errores absolutos parecidos y, sin embargo, comportarse de manera muy
+distinta para el stock: uno puede alternar arriba y abajo, mientras otro queda
+corto de manera persistente.
+
+La corrección multiplicativa de un segmento se estima con errores de A009 y
+A010, sólo si sus sesgos tienen el mismo signo:
+\begin{equation}
+ f_s=\operatorname{clip}_{[0{,}8;\,1{,}2]}
+ \left(\frac{\sum O_{s,t}}{\sum\widehat D_{s,t}}\right).
+\end{equation}
+Ese factor se prueba en A011. Se acepta para A012 y A013 únicamente si mejora
+su error absoluto y el signo sigue siendo estable. El factor aceptado sigue
+siendo el estimado \emph{antes} de A011; no se reajusta con el año que lo verifica.
+
+\tabla{sesgo.tex}{Contraste de la corrección de sesgo. Los MAE corresponden a
+A011; el factor se estimó con años anteriores.}
+{tab:sesgo}{\archivo{resultados/demanda/tablas/diagnostico_sesgo_oof.csv}}
+
+Se acepta una reducción de aproximadamente el 15,6\,\% en MD y un incremento
+del 20\,\% en SSUV. En B, C y S, la corrección propuesta empeora A011 y se
+descarta. MSUV no aporta un factor estable distinto de uno. La dispersión para
+simular conserva los errores brutos de los ejercicios de selección, sin escoger
+a posteriori sólo los años favorables; por ello tampoco certifica ausencia de sesgo.
+
+\subsection{Qué nos dice A012 y qué no nos dice}
+El error absoluto medio mensual es
+\begin{equation}
+ \mathrm{MAE}_s=\frac{1}{12}\sum_t|\widehat D_{s,t}-O_{s,t}|,
+ \qquad
+ \mathrm{sesgo}_s=\frac{1}{12}\sum_t(\widehat D_{s,t}-O_{s,t}).
+\end{equation}
+En el total comparable se suman los seis segmentos de cada mes \emph{antes}
+de calcular el error. El resultado es MAE de \num{240.5} coches por mes, sesgo
+de $-\num{190.2}$ y MAE relativo de 14,8\,\%.
+
+\tabla{validacion.tex}{Evaluación retrospectiva A012, clientes observados.
+Sesgo positivo: sobreprevisión. CSUV no forma parte del total.}
+{tab:validacion}{\archivo{resultados/demanda/tablas/evaluacion_retrospectiva_a012.csv}}
+
+El 14,8\,\% no debe compararse directamente con el 23,8\,\% de selección:
+cambian los años y la agregación. Los errores de distintos segmentos pueden
+compensarse en el total. Por ejemplo, el error relativo de C es 37,0\,\%, mucho
+mayor que el del total agregado.
+
+A012 ya se conocía durante el desarrollo inicial del proyecto. La reconstrucción
+del protocolo elimina fugas concretas, pero no transforma ese año en una prueba
+nunca vista. Se presenta como \textbf{evaluación retrospectiva}. Además se
+vuelven a estimar previsiones desde cierres mensuales y se evalúan a hasta tres
+meses; ese ejercicio responde al uso operativo de la revisión, no al plan anual
+inicial.
+
+\grafosanchos{validacion_a012_ocho_paneles.png}
+{Clientes observados y previsión al cierre de A011. Las diferencias entre segmentos
+explican por qué el MAE total no basta para fijar una única protección de stock.
+El panel de CSUV muestra el lanzamiento, no una validación equivalente.}
+{fig:validacion}{\archivo{demanda.ipynb}; evaluación retrospectiva A012}
+
+\subsection{Cuota reciente, producto y el caso especial de CSUV}
+La relación comercial acumula los últimos doce meses, excluyendo sucesos. Se usa
+un cociente de sumas, no una media simple de porcentajes mensuales:
+\begin{equation}
+ q_s=\frac{\sum_{t\in\mathcal V_s}O_{s,t}}
+           {\sum_{t\in\mathcal V_s}I_{s,t}},
+\end{equation}
+donde $\mathcal V_s$ identifica los meses seleccionados; se evita dar el mismo
+peso a meses con mercados muy distintos.
+
+\paso{Producto.}
+Se comparan ventanas completas y observables de seis meses antes y después de
+renovaciones, sin sucesos, roturas ni episodios solapados. El ratio utiliza clientes
+netos sobre mercado. Al no aislar causalidad, el efecto central adicional es cero.
+El optimista aplica una sensibilidad empírica tras retirar la exposición hipotética
+ya contenida en el ancla, evitando duplicidades.
+
+Se supone un calendario de enero y seis meses de efecto para B, SSUV, CSUV y
+MSUV. Con efecto central cero, retrasar MSUV hasta abril no cambia por sí solo
+la cantidad central; la pérdida de cuota por retraso se estudia en una prueba
+específica de sensibilidad. \emph{No identificado} no significa
+\emph{económicamente irrelevante}.
+
+\paso{CSUV.}
+Se utilizan septiembre--diciembre, excluyendo agosto parcial y ajustando los picos;
+se contrasta septiembre--octubre. El mercado permite proyectar todo A013 sin
+repetir ceros anteriores al lanzamiento. Su dispersión es un proxy de SSUV/MSUV
+ampliado por 1,5, con sensibilidad 1--2; no un error propio validado.
+
+\subsection{La salida de esta fase: doce meses, siete segmentos}
+El central combina mercado previsto, relación comercial y factores de sesgo
+aceptados. Después se descuenta el adelanto A012 una sola vez, repartido en los
+tres primeros meses. Los escenarios de demanda cambian macroeconomía, ayudas,
+producto, turismo y duración de la devolución.
+
+\tabla{forecast.tex}{Demanda anual prevista antes del efecto residual de combustible.
+Son previsiones condicionadas, no ventas simuladas ni medias de réplicas.}
+{tab:forecast}{\archivo{resultados/demanda/tablas/prevision_anual_por_escenario.csv}}
+
+El central estima unos \num{19077} clientes. El pesimista y optimista de esta
+fase estiman aproximadamente \num{16210} y \num{27700}. En
+\archivo{escenarios.ipynb} se añade el efecto residual del combustible antes
+del descuento absoluto del adelanto. Por eso no deben confundirse estas cifras
+intermedias con la demanda final de los escenarios ni con las ventas alcanzadas.
+
+\FloatBarrier
+\grafosanchos[\textbf{Del pronóstico a la logística.} Esta fase entrega una
+trayectoria central, alternativas y errores, no un pedido automático. El simulador
+descuenta stock y compromisos, añade protección y calcula las consecuencias.
+La incertidumbre de CSUV y los sesgos residuales siguen formando parte de la decisión.]
+{prevision_a013_ocho_paneles.png}
+{Previsiones condicionadas A013 y banda P10--P90 del central. El optimista puede
+tener un enero más bajo al concentrar la devolución del adelanto en ese mes,
+aunque termine el año con mayor demanda. Las escalas varían por segmento.}
+{fig:forecast}{\archivo{demanda.ipynb}; 1.000 trayectorias ilustrativas, semilla 42}

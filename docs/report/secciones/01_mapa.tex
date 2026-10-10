@@ -1,0 +1,103 @@
+\section{El problema completo, antes de entrar en los cálculos}\label{sec:mapa}
+
+\subsection{La decisión que queremos tomar}
+Kaido debe decidir cuánto encargar a fábrica sin conocer las ventas futuras.
+Si encarga poco, puede perder compradores; si encarga demasiado, mantiene coches
+que cuestan dinero y envejecen. Además, el pedido no llega de inmediato. Una
+decisión tomada después de observar una subida de ventas tarda tres meses en
+convertirse en una llegada modificable a la red.
+
+El objetivo del trabajo no es producir una cifra de ventas aislada. Es construir
+una \textbf{regla de decisión que siga funcionando cuando la previsión se
+equivoca}. Por eso se necesitan dos herramientas diferentes:
+\begin{enumerate}
+  \item Una \textbf{previsión}: estima cuántos clientes querrán comprar cada mes.
+  \item Una \textbf{simulación}: representa qué puede venderse realmente con el
+  stock disponible, los compromisos de suministro y la regla de revisión.
+\end{enumerate}
+La recomendación económica se obtiene al comparar políticas sobre las mismas
+trayectorias de demanda. El modelo trabaja por mes y por segmento; no representa
+individualmente los 64 concesionarios.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[node distance=5mm,
+  caja/.style={draw=gris!40,fill=fondo,rounded corners=1pt,text width=3.2cm,
+    minimum height=1.65cm,align=center,font=\small},
+  flecha/.style={-{Stealth[length=2mm]},draw=azul,thick}]
+  \node[caja] (d) {\textbf{Datos}\\Qué ocurrió\\Clientes y episodios};
+  \node[caja,right=of d] (p) {\textbf{Previsión}\\Qué podría ocurrir\\Mercado y posición};
+  \node[caja,right=of p] (s) {\textbf{Simulación}\\Qué podremos atender\\Stock y plazos};
+  \node[caja,right=of s] (e) {\textbf{Decisión}\\Qué política elegir\\Servicio y margen};
+  \draw[flecha] (d)--(p);\draw[flecha] (p)--(s);\draw[flecha] (s)--(e);
+\end{tikzpicture}
+\caption{Las cuatro piezas de la solución. Un error en una fase se transmite a
+las siguientes: una demanda mal interpretada puede terminar en un pedido mal dimensionado.}
+\label{fig:proceso}
+\fuente{estructura de los cuatro notebooks revisados}
+\end{figure}
+
+\subsection{Cómo se organiza el proyecto}
+\begin{table}[htbp]\centering
+\caption{Responsabilidad y resultado de cada notebook.}\label{tab:mapa-notebooks}
+\begin{tabularx}{\linewidth}{@{}p{3.4cm}YY@{}}\toprule
+Notebook & Pregunta principal & Resultado que entrega \\\midrule
+\archivo{datos.ipynb} & ¿Qué parte del histórico representa compras de clientes?
+& Series observadas, diagnóstico y ajustes de episodios.\\
+\archivo{demanda.ipynb} & ¿Qué demanda mensual podemos prever y qué error tiene?
+& Previsión, evaluación temporal y parámetros de incertidumbre.\\
+\archivo{simulacion.ipynb} & ¿Cómo se transforman pedidos y llegadas en ventas y costes?
+& Simulador comprobado y referencia determinista.\\
+\archivo{escenarios.ipynb} & ¿Qué política compensa y qué riesgos mantiene?
+& Simulaciones, política elegida, sensibilidades y entrega.\\\bottomrule
+\end{tabularx}
+\end{table}
+
+Los notebooks comparten las celdas de definiciones etiquetadas \archivo{api}.
+Las fases posteriores cargan esas funciones en un espacio independiente; no
+ejecutan de nuevo los gráficos de otra fase ni usan las tablas antiguas como si
+fueran el modelo. \archivo{analisis.ipynb} y los módulos históricos de previsión
+y simulación se conservan como referencia inicial. Este informe describe la
+\textbf{versión revisada}.
+
+\subsection{Tres niveles de afirmación}
+Conviene identificar en cada resultado de dónde procede la cifra:
+\begin{description}[style=nextline]
+  \item[Observado.] Se lee en los datos o se calcula directamente a partir de
+  ellos: por ejemplo, matriculaciones menos automatriculaciones.
+  \item[Estimado o supuesto.] Requiere un método o una hipótesis: por ejemplo,
+  cuántas compras se adelantaron o cuántos coches vienen ya en camino.
+  \item[Simulado.] Es el resultado de aplicar reglas y supuestos a una posible
+  trayectoria futura: ventas, stock y contribución de una réplica.
+\end{description}
+La distinción importa porque repetir mil veces una simulación no convierte sus
+supuestos en hechos. Tampoco una correlación histórica demuestra que una variable
+sea la causa de un cambio en las ventas.
+
+\subsection{Vocabulario mínimo para leer el resto}
+\begin{table}[htbp]\centering
+\caption{Conceptos que no deben confundirse.}\label{tab:glosario-inicial}
+\begin{tabularx}{\linewidth}{@{}p{3.2cm}Y@{}}\toprule
+Concepto & Interpretación en este trabajo \\\midrule
+Matriculaciones & Incluyen ventas a clientes y automatriculaciones.\\
+Venta a cliente & Compra observada después de descontar automatriculaciones.\\
+Demanda potencial & Lo que los clientes querrían comprar; puede superar las ventas si falta stock.\\
+Wholesale / retail & Facturación a la red / venta al cliente, respectivamente.\\
+PFF & Precio franco fábrica; no es el PVP con impuestos.\\
+VM & Gasto comercial: descuentos, campañas e incentivos por vehículo.\\
+CVP & Contribución del vehículo después del VM: beneficio bruto menos VM.\\
+Transfer & Vehículo procedente del stock de otro país europeo para cubrir un faltante.\\
+FIFO & Se vende primero la cohorte más antigua disponible.\\
+Escenario & Conjunto coherente de supuestos sobre A013.\\
+Réplica & Una trayectoria aleatoria completa dentro de un escenario.\\\bottomrule
+\end{tabularx}
+\fuente{enunciado, secciones 2 y 9, y convenciones de la simulación revisada}
+\end{table}
+
+\begin{idea}{La idea que conviene conservar}
+Una previsión de \num{1000} coches no significa que se venderán \num{1000}.
+Primero tiene que existir esa demanda y después tiene que haber coches para
+atenderla. Por último, vender esos coches debe evaluarse con sus costes: más
+unidades no siempre implican más contribución.
+\end{idea}
+\FloatBarrier

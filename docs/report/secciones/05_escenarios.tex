@@ -1,0 +1,204 @@
+\section{Cuarta fase: escenarios, incertidumbre y elección de política}\label{sec:escenarios}
+
+\begin{idea}{Dos preguntas que requieren respuestas distintas}
+\textbf{Escenario:} ¿qué cambia si la economía, la normativa o el suministro son
+distintos? \textbf{Incertidumbre dentro del escenario:} aun bajo esos supuestos,
+¿cuánto pueden variar los meses? Las sensibilidades examinan además si una
+hipótesis poco identificada cambia la decisión. No son tres nombres para la misma cosa.
+\end{idea}
+
+\subsection{De una historia a parámetros concretos}
+El central mantiene las condiciones económicas del cierre de A012. Los extremos
+utilizan un modelo macroeconómico auxiliar para obtener un único cociente entre
+mercado bajo el escenario y mercado auxiliar central. Ese cociente se aplica a
+la previsión elegida: no se sustituye el central por otro modelo ni se suma una
+penalización económica genérica adicional.
+
+\begin{table}[htbp]\centering
+\caption{Principales supuestos A013. Las variaciones de indicadores se miden
+respecto al cierre de A012; no son variaciones de ventas.}\label{tab:escenarios-param}
+\small
+\begin{tabularx}{\linewidth}{@{}p{3.6cm}YYY@{}}\toprule
+Factor & Pesimista & Central & Optimista \\\midrule
+Paro & +2 puntos porcentuales & Sin cambio & $-1$ punto porcentual \\
+Confianza & $-16{,}26$ puntos de índice & Sin cambio & +19,14 puntos de índice \\
+Tipo de crédito & +0,546 puntos porcentuales & Sin cambio & $-0{,}546$ puntos porcentuales \\
+Devolución del adelanto & 6 meses & 3 meses & 1 mes \\
+Ayuda pública & No & No & Abril--diciembre \\
+Producto & Central neutro; retraso en sensibilidad & Efecto adicional cero & +16,8\,\% hipotético durante 6 meses, con normalización previa \\
+Turismo & Cambio bajo de viajeros & Sin cambio & Cambio alto de viajeros \\
+Combustible residual & $-3\,\%$ de demanda & Cero & $+3\,\%$ de demanda \\
+CO$_2$ & Prima del catálogo por venta & Sin prima & Sin prima \\
+Nueva importación & +500 \euro/coche por arancel & Sin recargo & $-250$ \euro/coche por divisa \\
+Suministro MSUV & Pérdida de producción en marzo; llegada junio & Sin interrupción & Sin interrupción \\\bottomrule
+\end{tabularx}
+\fuente{\archivo{resultados/escenarios/tablas/parametros_escenarios_a013.csv}}
+\end{table}
+
+Los choques de confianza y viajeros se apoyan en percentiles de cambios históricos
+a nueve meses; el del crédito, en la mediana absoluta de esos cambios. El paro
+sigue la propuesta del enunciado. Turismo afecta al canal de alquiler durante
+marzo--junio, ponderado por su peso en los clientes de Kaido, no por el peso del
+alquiler en todo el mercado.
+
+El combustible, el arancel y el cambio no tienen una base suficiente para estimar
+sus tamaños causalmente. Sus importes son \textbf{pruebas de estrés explícitas},
+contrastadas con valores cero y dobles. El coste arancelario no se calcula como
+un porcentaje arbitrario del PVP. La divisa sólo cambia el coste de las nuevas
+importaciones; no revaloriza gratuitamente los coches iniciales.
+
+\subsection{En qué orden se aplican los efectos}
+La composición importa. Primero se aplican efectos sobre mercado y posición,
+turismo y combustible. Después se descuenta el adelanto expresado en coches:
+\begin{equation}\label{eq:demanda-escenario}
+ \widehat D^{(e)}_{s,t}
+ =\max\!\left(0,\ \widehat D^{(e),\mathrm{previa}}_{s,t}(1+c_e)
+                       -\frac{A_s}{m_e}\,\mathbf1_{t\leq m_e}\right).
+\end{equation}
+$c_e$ es el efecto residual del combustible; $A_s$, el adelanto A012; y $m_e$,
+el número de meses de devolución. La misma cantidad central $A_s$ se solicita
+en los tres escenarios. Multiplicar después por $1+c_e$ alteraría también el
+adelanto absoluto, que no debe convertirse en una segunda elasticidad.
+
+En el optimista, concentrar la devolución en enero supera la demanda prevista
+de algunos segmentos. El límite a cero deja \num{235.3} coches del adelanto sin
+descontar en la integración final. Se declara esa parte no aplicada; no se crea
+demanda negativa ni se traslada silenciosamente a febrero. Es una limitación de
+la combinación de hipótesis, no un error de redondeo.
+
+\subsection{Generar años posibles sin perder la dependencia entre meses}
+Una réplica produce 18 meses de demanda realizada: A013 y seis meses de
+continuidad. La realización se genera mediante
+\begin{equation}\label{eq:ruido}
+ D^{(r,e)}_{s,t}=\operatorname{redondear}
+ \left[\widehat D^{(e)}_{s,t}
+       \exp\!\left(\sigma_{\log,s}Z^{(r)}_{s,t}
+                         -\frac{\sigma_{\log,s}^{2}}{2}\right)\right].
+\end{equation}
+El factor exponencial es positivo. Si $Z$ es normal de media cero y varianza uno,
+restar $\sigma_{\log,s}^{2}/2$ hace que el factor tenga media uno antes del
+redondeo. No significa que cada réplica coincida con la previsión ni que su
+mediana sea igual a su media.
+
+El ruido contiene una parte común y una específica:
+\begin{align}
+ Z_{s,t}&=\sqrt\rho\,U_t+\sqrt{1-\rho}\,W_{s,t},\\
+ U_t&=\phi U_{t-1}+\sqrt{1-\phi^2}\,\eta_t,
+\end{align}
+con una ecuación análoga para $W$. Las innovaciones $\eta$ son normales
+independientes; $\phi$ introduce persistencia temporal y $\rho$ co-movimiento
+entre segmentos. En la ejecución, $\phi\simeq0{,}210$ y $\rho\simeq0{,}190$.
+No se asume que un mes alto se compense necesariamente con uno bajo.
+
+\tabla{incertidumbre.tex}{Dispersión de errores por segmento. Son parámetros
+adimensionales; $\sigma_{3,\mathrm{rel}}$ corresponde a errores acumulados en tres meses.}
+{tab:incertidumbre}{\archivo{resultados/escenarios/tablas/parametros_incertidumbre_a013.csv}}
+
+Los parámetros proceden de los errores de selección en segmentos maduros,
+separando años al calcular ventanas y correlaciones. El logaritmo de error usa
+un suavizado de 0,5 coche para tratar ceros. CSUV recibe el proxy ampliado. El
+valor muy elevado de la dispersión relativa de S revela una serie pequeña e
+inestable: no debe interpretarse como una precisión demostrada para ese nicho.
+
+\subsection{Qué ocurre dentro de cada réplica}
+La secuencia se repite sin cambiar las reglas de contabilidad:
+\begin{enumerate}
+  \item Se parte del mismo stock y del mismo plan inicial para los tres escenarios.
+  \item Llegan los compromisos del mes, respetando las interrupciones conocidas.
+  \item Se atiende la demanda con FIFO y, sólo en la alternativa correspondiente,
+  con transfers disponibles.
+  \item Se anotan ventas, faltantes, edades, stock y costes.
+  \item Se observan ventas y disponibilidad, se revisa la previsión y se decide
+  únicamente la llegada de dentro de tres meses.
+  \item Se continúa hasta junio de A014 para examinar los efectos de cierre.
+\end{enumerate}
+
+La falta de una pieza en fábrica en marzo afecta a la llegada de junio de MSUV.
+No borra coches que ya estaban viajando. La producción perdida no se recupera
+automáticamente después; hacerlo requeriría otra hipótesis de capacidad.
+
+Todos los escenarios utilizan las mismas innovaciones aleatorias al compararse.
+Esto no impone probabilidades a los escenarios: reduce ruido al comparar políticas.
+La semilla 42 permite reproducir las trayectorias.
+
+\subsection{Cómo leer media, mediana y P10--P90}
+\begin{description}[style=nextline]
+\item[Media.] Promedio de las réplicas; es la magnitud usada para la contribución
+esperada bajo un escenario.
+\item[Mediana.] Mitad de las réplicas por encima y mitad por debajo.
+\item[P10 y P90.] Aproximadamente el 10\,\% de las réplicas queda por debajo del
+primero y el 10\,\% por encima del segundo. El intervalo intermedio contiene
+aproximadamente el 80\,\% de las realizaciones de la simulación.
+\end{description}
+No son un intervalo de confianza para una verdad desconocida ni una probabilidad
+de que se produzca el escenario. Para el total se suman los segmentos
+\emph{dentro de cada réplica} y después se calculan sus percentiles. La suma de
+medianas de segmentos no es, en general, la mediana del total.
+
+\subsection{Elegir una política: margen sujeto a servicio}
+El servicio de un segmento en una réplica es la proporción de su demanda anual
+que se ha podido atender:
+\begin{equation}\label{eq:servicio}
+ F_s^{(r)}=\frac{\sum_{t\in A013}V_{s,t}^{(r)}}
+                 {\sum_{t\in A013}D_{s,t}^{(r)}}.
+\end{equation}
+La restricción acordada es que la \textbf{media de $F_s$ en el central} alcance
+el 95\,\% en los segmentos marginalmente viables. No es un 95\,\% de
+probabilidad de pasar el año sin roturas ni un requisito en cada escenario.
+
+Se prueban seis niveles de protección:
+$z\in\{0;\,0{,}84;\,1{,}28;\,1{,}65;\,2{,}33;\,3\}$.
+El piloto usa 200 réplicas. Como no se impone una capacidad compartida de fábrica
+no cuantificada en el caso, cada segmento puede escoger su nivel.
+
+Entre políticas factibles se busca mayor contribución media central. Cuando una
+opción con menor colchón queda a no más de dos errores estándar de Monte Carlo
+de la mejor, se prefiere la menor protección. El error estándar se calcula sobre
+las diferencias emparejadas:
+\begin{equation}
+ \mathrm{EE}(\overline{\Delta R})
+ =\frac{\operatorname{sd}(R^{(r)}_{\mathrm{mejor}}-R^{(r)}_z)}{\sqrt N}.
+\end{equation}
+Esta tolerancia depende de la precisión computacional de la comparación, no
+de una cantidad fija idéntica para todos los segmentos. Tampoco mide toda la
+incertidumbre económica del modelo.
+
+La política elegida se comprueba con 1.000 réplicas. El código permite aumentar
+el colchón si esa verificación descubre un incumplimiento; en la ejecución
+presentada no fue necesario cambiar los valores elegidos por el piloto.
+
+\tabla{politica.tex}{Política seleccionada y servicio anual central. La
+probabilidad indicada es la frecuencia simulada de $F_s<95\,\%$, condicionada al central.}
+{tab:politica}{\archivo{resultados/escenarios/tablas/politica_recomendada_a013.csv}}
+
+SSUV alcanza un servicio medio del 95,4\,\%, pero en el 39,1\,\% de las
+réplicas no llega al 95\,\%. No hay contradicción: la restricción está formulada
+sobre la media. Su P10 del 89,3\,\% expresa un riesgo que la media oculta.
+
+\begin{figure}[htbp]\centering
+\begin{tikzpicture}
+\begin{axis}[width=.94\linewidth,height=6.7cm,xmin=-.4,xmax=6.4,ymin=80,ymax=101,
+  xtick={0,1,2,3,4,5,6},xticklabels={B,C,MD,SSUV,CSUV,MSUV,S},
+  ylabel={Demanda anual atendida (\%)},xlabel={Segmento},
+  legend style={at={(.5,-.24)},anchor=north,legend columns=3}]
+\addplot[azul,only marks,mark=*,mark size=2.4pt]
+  table[col sep=comma,x expr=\coordindex,y expr=100*\thisrow{servicio_central}]
+  {datos/politica_recomendada_a013.csv};\addlegendentry{Media central}
+\addplot[gris,only marks,mark=square*,mark size=2.1pt]
+  table[col sep=comma,x expr=\coordindex,y expr=100*\thisrow{p10_servicio}]
+  {datos/politica_recomendada_a013.csv};\addlegendentry{P10 central}
+\addplot[azul,dashed,domain=-.4:6.4]{95};\addlegendentry{Objetivo en media}
+\end{axis}\end{tikzpicture}
+\caption{Cumplir el objetivo medio no elimina años desfavorables.
+El eje vertical está ampliado al intervalo 80--101\,\%; son puntos, no barras
+de cantidades con origen recortado.}
+\label{fig:servicio}\fuente{política recomendada, 1.000 réplicas centrales}
+\end{figure}
+
+\begin{idea}{Alcance de la elección}
+Se recomienda la mejor opción entre las políticas comparadas bajo el objetivo
+declarado. No se demuestra un óptimo global ni una política óptima para cualquier
+probabilidad de escenarios. La malla, la ausencia de capacidad compartida y la
+forma de los errores son parte del experimento.
+\end{idea}
+\FloatBarrier
