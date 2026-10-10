@@ -13,7 +13,9 @@ Priorizar una solución que se pueda ejecutar, comprobar y explicar en clase.
 Empezar por el método más sencillo que permita responder la pregunta. Añadir
 complejidad solo cuando mejore la validación o represente una restricción del caso.
 
-**Estado:** las cinco fases completadas. Resumen ejecutivo y presentación en `docs/`.
+**Estado:** solución revisada en los cuatro notebooks de fase, con resumen y
+presentación regenerables en `docs/`. Las decisiones aprobadas, su estado y los
+límites de identificación están en el [plan de revisión](plan-revision-modelo.md).
 
 El PDF es la fuente del caso; el Markdown es su versión de lectura adaptada a los
 nombres actuales. Los CSV son la fuente para calcular resultados. Si aparecen
@@ -29,16 +31,20 @@ tratarlas. No corregir los datos para que encajen con una cifra narrativa.
 | `examples/` | Referencia docente, separada de la solución |
 | `config/graficos.mplstyle` | Aspecto común de las figuras |
 | `src/datos.py` | Lectura, validaciones, fechas y preparación |
-| `src/demanda.py` | Referencia estacional, modelo de mercado, cuota y evaluación |
-| `src/escenarios.py` | Supuestos de los tres escenarios y su demanda prevista |
-| `src/simulacion.py` | Flujo mensual, plan de llegadas, antigüedad (FIFO) y costes |
-| `analisis.ipynb` | Hilo conductor: preguntas, ejecución y explicación |
-| `resultados/` | Tablas y figuras regenerables para el análisis y la entrega |
+| `src/demanda.py`, `src/escenarios.py`, `src/simulacion.py` | Implementación inicial conservada como referencia |
+| `analisis.ipynb` | Análisis inicial conservado, sin las correcciones de la revisión |
+| `datos.ipynb` | Datos, diagnóstico, ledger de episodios y restricciones |
+| `demanda.ipynb` | Previsión, validación temporal y supuestos de demanda |
+| `simulacion.ipynb` | API logística revisada, ejemplo determinista y comprobaciones |
+| `escenarios.ipynb` | Incertidumbre, política, sensibilidades y generación de la entrega |
+| `resultados/` | Tablas y figuras regenerables, separadas por notebook y tipo |
 
-Crear los módulos y el notebook cuando tengan contenido ejecutable. El notebook
-llamará a funciones de `src/`; los módulos no dependerán del notebook. Centralizar
-los supuestos del modelo en `escenarios.py` inicialmente. Separar una configuración
-de parámetros solo si el tamaño lo justifica.
+Los cambios de lógica y código de la revisión pertenecen a los cuatro notebooks
+nuevos. Sus celdas etiquetadas `api` contienen únicamente imports, constantes y
+funciones; se cargan mediante JSON en un espacio aislado, sin ejecutar los gráficos
+ni exportaciones de otra fase. No duplicar una función corregida ni volver a los
+módulos históricos de previsión o simulación. Los supuestos se documentan donde se
+calculan y se exportan en las tablas de parámetros de demanda y escenarios.
 
 ## 3. Código y archivos
 
@@ -170,8 +176,9 @@ La leyenda y el trazo deben permitir entender la figura sin depender del color.
 
 ### Exportación
 
-Guardar las figuras finales en `resultados/figuras/` como PNG a 300 ppp y SVG para
-ampliaciones. Fondo blanco, márgenes ajustados y nombre descriptivo, por ejemplo
+Guardar las figuras de cada notebook separado en
+`resultados/<notebook>/figuras/` como PNG a 300 ppp y SVG para ampliaciones. El
+notebook completo conserva `resultados/figuras/`. Fondo blanco, márgenes ajustados y nombre descriptivo, por ejemplo
 `demanda_msuv_a013_escenarios.png`. Revisar etiquetas y leyendas en el tamaño final.
 Para una presentación, aumentar la tipografía de forma consistente, sin cambiar
 colores ni significados. Las figuras originales del enunciado conservan su diseño.
@@ -204,22 +211,24 @@ colores ni significados. Las figuras originales del enunciado conservan su dise�
   el margen solo sobre ventas realizadas; su coste de oportunidad se informa aparte.
 - No asignar probabilidades a los escenarios ni impactos a sucesos sin justificarlos.
 
-### Decisiones metodológicas pendientes
+### Decisiones vigentes y límites de identificación
 
-Antes de implementar cada parte, anotar en el notebook el supuesto, su fuente o
-justificación y su efecto esperado. Los ajustes por compras adelantadas y falta de
-stock están resueltos en la sección 1.7 del notebook, y las variables, la cuota y el
-tratamiento de CSUV en la sección 2.1; las llegadas iniciales, la edad del stock, el
-stock de seguridad base y el redondeo, en la sección 3.1; la traducción de los
-sucesos, la revisión mensual y la dependencia de los errores, en la sección 4.1.
-Quedan por resolver:
+Antes de interpretar una cifra, distinguir datos observados, supuestos y resultados.
+El [plan de revisión](plan-revision-modelo.md) recoge las decisiones D1–D23;
+los notebooks contienen sus cálculos y comprobaciones.
 
-- Nivel de servicio por segmento, disponibilidad/plazo de transfers y tratamiento de
-  las automatriculaciones.
-- Tamaño del combustible, el tipo de cambio y el arancel: se mencionan en los
-  escenarios, pero no tienen una columna directa en el CSV económico y no se
-  cuantifican en la fase 4.
-- Pedidos de fin de A013 que llegarían en A014 y valoración del stock final.
+- Servicio objetivo: 95 % de unidades anuales en media central para segmentos
+  marginalmente viables; informar también P10 y frecuencia de incumplimiento.
+- Caso base sin automatriculaciones ni transfers garantizados. El transfer es una
+  alternativa de disponibilidad limitada y entrega directa, con VM y coste propios.
+- Combustible, arancel y cambio tienen tamaños exploratorios explícitos y
+  sensibilidades, no coeficientes causales identificados con columnas inexistentes.
+- Producto central neutro por identificación insuficiente; efectos empíricos y
+  retrasos se contrastan como sensibilidades. CSUV no hereda una validación ficticia.
+- Los pedidos finales de A013 se siguen en A014. La prolongación de seis meses
+  contrasta la continuidad, sin ingresos ficticios por vender el inventario final.
+- Si la caída de un mes no permite descontar todo el adelanto estimado, cuantificar
+  el importe no aplicado y comunicar la limitación; no inventar demanda negativa.
 
 ## 8. Orden de implementación y criterios de finalización
 

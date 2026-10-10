@@ -1,0 +1,24 @@
+{
+  "modelo": "conf_intercepto",
+  "crecimiento_observado": 0.05950979890497887,
+  "crecimiento_comparable": -0.0014839072813794818,
+  "crecimiento_ajustado": 0.02468805589133405,
+  "mae_relativo_a012": 0.14787924979537362,
+  "co2_aislado_meur": -55.007132592,
+  "fecha": "2026-10-10",
+  "limitaciones": [
+    "A012 es evaluación retrospectiva; ya influyó en el desarrollo inicial.",
+    "CSUV tiene poca historia: cuota, lanzamiento e incertidumbre requieren sensibilidad.",
+    "Pipeline, fechas de producto, combustible, arancel y divisa incluyen supuestos explícitos.",
+    "No hay automatriculaciones ni transfers garantizados en la política base.",
+    "A014 es continuidad supuesta; el resultado es contribución tras costes modelizados.",
+    "Producto central neutro por identificación insuficiente; el retraso se contrasta como sensibilidad.",
+    "Optimista: 235 coches de adelanto no caben en la caída supuesta; no se trasladan a otro mes."
+  ],
+  "hallazgos": [
+    "Plan inicial: 16.144 coches asignados a pedidos decididos en A013; 18.114 llegadas previstas en A013. Son flujos distintos.",
+    "La prima de CO₂ reduce la contribución central en 55,01 M€ si se mantienen exactamente las mismas ventas y flujos."
+  ],
+  "servicio_factible": true,
+  "ruta_figura_stock": "resultados/escenarios/figuras/plan_recomendado_ventas_stock_a013.png"
+}

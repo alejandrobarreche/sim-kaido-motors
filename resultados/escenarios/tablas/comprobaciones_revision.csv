@@ -1,0 +1,4 @@
+escenario,balance_maximo,demanda_balance_maximo,mismo_plan_inicial,unidades_enteras
+pesimista,0.0,0.0,True,True
+central,0.0,0.0,True,True
+optimista,0.0,0.0,True,True

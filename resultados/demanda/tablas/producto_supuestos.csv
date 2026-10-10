@@ -1,0 +1,8 @@
+segmento,n_episodios,mediana_empirica,efecto_central,efecto_alto,efecto_alto_propio,fuente_alto,inicio_a013,duracion_meses,justificacion
+B,1,-0.11217979990237803,0.0,0.16807492491574677,0.0,"P75 episodios positivos de otros segmentos: sensibilidad, no evidencia propia",145.0,6,Antes/después no identifica causalidad; central neutro y sensibilidad empírica
+C,1,-0.083926703978491,0.0,0.16807492491574677,0.0,"P75 episodios positivos de otros segmentos: sensibilidad, no evidencia propia",,6,Antes/después no identifica causalidad; central neutro y sensibilidad empírica
+MD,1,0.02374346865994803,0.0,0.02374346865994803,0.02374346865994803,P75 propio,,6,Antes/después no identifica causalidad; central neutro y sensibilidad empírica
+SSUV,1,-0.2434871244586263,0.0,0.16807492491574677,0.0,"P75 episodios positivos de otros segmentos: sensibilidad, no evidencia propia",145.0,6,Antes/después no identifica causalidad; central neutro y sensibilidad empírica
+CSUV,0,,0.0,0.16807492491574677,0.0,"P75 episodios positivos de otros segmentos: sensibilidad, no evidencia propia",145.0,6,Antes/después no identifica causalidad; central neutro y sensibilidad empírica
+MSUV,0,,0.0,0.16807492491574677,0.0,"P75 episodios positivos de otros segmentos: sensibilidad, no evidencia propia",145.0,6,Antes/después no identifica causalidad; central neutro y sensibilidad empírica
+S,1,0.21618541033434635,0.0,0.21618541033434635,0.21618541033434635,P75 propio,,6,Antes/después no identifica causalidad; central neutro y sensibilidad empírica

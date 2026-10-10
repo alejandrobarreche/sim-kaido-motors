@@ -1,0 +1,52 @@
+escenario,factor,valor,unidad,justificacion
+pesimista,paro,2.0,puntos del indicador,Trayectoria congelada + choque explícito; relación histórica no causal
+pesimista,confianza_consumidor,-16.259999999999998,puntos del indicador,P10/P90 de cambios históricos a nueve meses; central sin cambio
+pesimista,tipo_credito_consumo,0.5459999999999994,puntos del indicador,Mediana absoluta del cambio histórico a nueve meses
+pesimista,turismo,-8.197999999999999,puntos del indicador,P10/P90 de cambios históricos a nueve meses; central sin cambio
+pesimista,duracion_ledger,6.0,meses,Misma cantidad central del ledger en todos los escenarios
+pesimista,ayuda,0.0,indicador abr-dic,Trayectoria congelada + choque explícito; relación histórica no causal
+pesimista,producto_B,0.0,variación ratio neto/mercado durante 6 meses,Enero supuesto; MSUV pesimista abril; central neutro por identificación insuficiente
+pesimista,producto_SSUV,0.0,variación ratio neto/mercado durante 6 meses,Enero supuesto; MSUV pesimista abril; central neutro por identificación insuficiente
+pesimista,producto_CSUV,0.0,variación ratio neto/mercado durante 6 meses,Enero supuesto; MSUV pesimista abril; central neutro por identificación insuficiente
+pesimista,producto_MSUV,0.0,variación ratio neto/mercado durante 6 meses,Enero supuesto; MSUV pesimista abril; central neutro por identificación insuficiente
+central,paro,0.0,puntos del indicador,Trayectoria congelada + choque explícito; relación histórica no causal
+central,confianza_consumidor,0.0,puntos del indicador,P10/P90 de cambios históricos a nueve meses; central sin cambio
+central,tipo_credito_consumo,0.0,puntos del indicador,Mediana absoluta del cambio histórico a nueve meses
+central,turismo,0.0,puntos del indicador,P10/P90 de cambios históricos a nueve meses; central sin cambio
+central,duracion_ledger,3.0,meses,Misma cantidad central del ledger en todos los escenarios
+central,ayuda,0.0,indicador abr-dic,Trayectoria congelada + choque explícito; relación histórica no causal
+central,producto_B,0.0,variación ratio neto/mercado durante 6 meses,Enero supuesto; MSUV pesimista abril; central neutro por identificación insuficiente
+central,producto_SSUV,0.0,variación ratio neto/mercado durante 6 meses,Enero supuesto; MSUV pesimista abril; central neutro por identificación insuficiente
+central,producto_CSUV,0.0,variación ratio neto/mercado durante 6 meses,Enero supuesto; MSUV pesimista abril; central neutro por identificación insuficiente
+central,producto_MSUV,0.0,variación ratio neto/mercado durante 6 meses,Enero supuesto; MSUV pesimista abril; central neutro por identificación insuficiente
+optimista,paro,-1.0,puntos del indicador,Trayectoria congelada + choque explícito; relación histórica no causal
+optimista,confianza_consumidor,19.142000000000003,puntos del indicador,P10/P90 de cambios históricos a nueve meses; central sin cambio
+optimista,tipo_credito_consumo,-0.5459999999999994,puntos del indicador,Mediana absoluta del cambio histórico a nueve meses
+optimista,turismo,9.668200000000002,puntos del indicador,P10/P90 de cambios históricos a nueve meses; central sin cambio
+optimista,duracion_ledger,1.0,meses,Misma cantidad central del ledger en todos los escenarios
+optimista,ayuda,1.0,indicador abr-dic,Trayectoria congelada + choque explícito; relación histórica no causal
+optimista,producto_B,0.16807492491574677,variación ratio neto/mercado durante 6 meses,Enero supuesto; MSUV pesimista abril; central neutro por identificación insuficiente
+optimista,producto_SSUV,0.16807492491574677,variación ratio neto/mercado durante 6 meses,Enero supuesto; MSUV pesimista abril; central neutro por identificación insuficiente
+optimista,producto_CSUV,0.16807492491574677,variación ratio neto/mercado durante 6 meses,Enero supuesto; MSUV pesimista abril; central neutro por identificación insuficiente
+optimista,producto_MSUV,0.16807492491574677,variación ratio neto/mercado durante 6 meses,Enero supuesto; MSUV pesimista abril; central neutro por identificación insuficiente
+pesimista,combustible_residual,-0.03,proporción demanda,Estrés exploratorio no estimado; sensibilidad cero y doble
+pesimista,arancel_nueva_importacion,500.0,€/coche,"Coste adicional supuesto, no tipo aduanero ni PVP"
+pesimista,cambio_nueva_importacion,0.0,€/coche,Ahorro supuesto; no afecta al stock inicial
+pesimista,prima_co2,1.0,0/1,Prima del catálogo por venta
+pesimista,interrupcion_MSUV,1.0,mes perdido,Fábrica en marzo; llegada junio; sin recuperación automática
+pesimista,transfer_fraccion,0.0,proporción déficit,Sin disponibilidad garantizada
+pesimista,automatriculaciones,0.0,coches,Política base aprobada
+central,combustible_residual,0.0,proporción demanda,Estrés exploratorio no estimado; sensibilidad cero y doble
+central,arancel_nueva_importacion,0.0,€/coche,"Coste adicional supuesto, no tipo aduanero ni PVP"
+central,cambio_nueva_importacion,0.0,€/coche,Ahorro supuesto; no afecta al stock inicial
+central,prima_co2,0.0,0/1,Prima del catálogo por venta
+central,interrupcion_MSUV,0.0,mes perdido,Fábrica en marzo; llegada junio; sin recuperación automática
+central,transfer_fraccion,0.0,proporción déficit,Sin disponibilidad garantizada
+central,automatriculaciones,0.0,coches,Política base aprobada
+optimista,combustible_residual,0.03,proporción demanda,Estrés exploratorio no estimado; sensibilidad cero y doble
+optimista,arancel_nueva_importacion,0.0,€/coche,"Coste adicional supuesto, no tipo aduanero ni PVP"
+optimista,cambio_nueva_importacion,-250.0,€/coche,Ahorro supuesto; no afecta al stock inicial
+optimista,prima_co2,0.0,0/1,Prima del catálogo por venta
+optimista,interrupcion_MSUV,0.0,mes perdido,Fábrica en marzo; llegada junio; sin recuperación automática
+optimista,transfer_fraccion,0.0,proporción déficit,Sin disponibilidad garantizada
+optimista,automatriculaciones,0.0,coches,Política base aprobada

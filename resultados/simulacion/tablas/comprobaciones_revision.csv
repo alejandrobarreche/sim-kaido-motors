@@ -1,0 +1,11 @@
+comprobacion,correcto
+tabla_3_planificador,True
+coste_15_dias,True
+limite_180,True
+FIFO_VM,True
+intereses_tramos,True
+transfer_VM_coste,True
+balance_enteros,True
+sin_anticipacion,True
+pedido_diciembre_llega_marzo,True
+continuidad_18_meses,True

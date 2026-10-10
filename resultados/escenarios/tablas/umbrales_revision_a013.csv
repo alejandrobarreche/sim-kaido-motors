@@ -1,0 +1,8 @@
+segmento,razon_minima,razon_maxima,ventanas,proxy,metodo
+B,0.7412793309319354,1.7345580548302135,30,False,cociente sumas 3 meses por origen
+C,0.8801963076076719,1.1955624961987148,30,False,cociente sumas 3 meses por origen
+MD,0.6663061196176276,0.9189962900305672,30,False,cociente sumas 3 meses por origen
+SSUV,0.9409547572713345,2.0510497362896185,30,False,cociente sumas 3 meses por origen
+CSUV,0.7628001390066087,2.2455503159706582,60,True,"cociente sumas 3 meses; proxy SSUV/MSUV ampliado ×1,5"
+MSUV,0.8032531691108521,1.2962416931645238,30,False,cociente sumas 3 meses por origen
+S,0.6620216205610652,10.306254381649161,30,False,cociente sumas 3 meses por origen

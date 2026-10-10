@@ -11,14 +11,16 @@ y simular cómo afecta a la producción, el stock y el beneficio en tres escenar
 
 ## Estado y punto de entrada
 
-**Las cinco fases están completadas**: datos, previsión de la demanda, simulación
-determinista, escenarios con incertidumbre y entrega. `src/datos.py` carga y
-comprueba los CSV; `src/demanda.py` prevé la demanda mensual por segmento y
-`src/escenarios.py` traduce los sucesos de la tabla 4 a parámetros y
-`src/simulacion.py` simula un año de la cadena de suministro, también con
-incertidumbre. `analisis.ipynb` documenta el diagnóstico de A012, la validación, la
-previsión de A013, la simulación determinista y los tres escenarios con 1.000
-repeticiones. Los documentos de entrega están en `docs/`.
+La solución revisada se encuentra en **`datos.ipynb`, `demanda.ipynb`,
+`simulacion.ipynb` y `escenarios.ipynb`**. El
+[plan de revisión](docs/plan-revision-modelo.md) recoge las 23 decisiones aprobadas
+y su estado. La [auditoría](docs/auditoria-modelo.md) describe la versión inicial.
+
+Los notebooks revisados contienen la lógica actual y comparten únicamente sus
+celdas de definiciones etiquetadas `api`, cargadas en espacios independientes.
+`src/datos.py` conserva la lectura y las comprobaciones originales. Los otros
+módulos de `src/` y `analisis.ipynb` corresponden a la versión inicial y se
+conservan como referencia; no producen la recomendación revisada.
 
 Antes de trabajar, leer:
 
@@ -48,15 +50,22 @@ Kaido-Motors/
 ├── examples/                         # Ejemplo del Anexo 4, con rutas actualizadas
 ├── src/
 │   ├── datos.py                      # Lectura, comprobaciones y series mensuales
-│   ├── demanda.py                    # Modelo de mercado, cuota, validación y previsión
-│   ├── escenarios.py                 # Parámetros de los tres escenarios y su demanda
-│   └── simulacion.py                 # Plan de llegadas, stock FIFO, costes y Monte Carlo
-├── resultados/                       # Tablas y figuras regenerables
-└── analisis.ipynb                    # Hilo conductor del análisis
+│   ├── demanda.py                    # Previsión histórica, conservada como referencia
+│   ├── escenarios.py                 # Escenarios históricos
+│   └── simulacion.py                 # Simulación histórica
+├── resultados/                       # Salidas separadas por notebook y tipo
+├── datos.ipynb                       # Datos y demanda observada
+├── demanda.ipynb                     # Validación y previsión de demanda
+├── simulacion.ipynb                  # Simulación determinista
+├── escenarios.ipynb                  # Incertidumbre y recomendación
+└── analisis.ipynb                    # Versión inicial, conservada como referencia
 ```
 
-`analisis.ipynb` es el hilo conductor y llama a los módulos de `src/`. Las responsabilidades de cada módulo
-están en la guía.
+Cada notebook revisado guarda sus salidas en
+`resultados/<notebook>/tablas/` y `resultados/<notebook>/figuras/`.
+La preparación de datos, la previsión y el simulador tienen una única definición
+activa en sus respectivos notebooks; las fases posteriores no ejecutan sus
+gráficos ni leen resultados antiguos para reconstruir el modelo.
 
 ## Puesta en marcha
 
@@ -66,11 +75,24 @@ Python 3.10 o superior. Desde la raíz del repositorio:
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+python -m ipykernel install --user --name kaido-motors --display-name "Python (kaido-motors)"
 ```
 
 En Windows, activar con `.venv\Scripts\activate`.
 Si ya se utiliza un entorno de Conda para este proyecto, instalar las dependencias
 en ese entorno en lugar de crear otro.
+
+Abrir Jupyter desde la raíz y ejecutar «reiniciar y ejecutar todo», en este orden:
+`datos.ipynb` → `demanda.ipynb` → `simulacion.ipynb` → `escenarios.ipynb`.
+Elegir el kernel del entorno donde se han instalado las dependencias. Los cálculos
+son autónomos respecto a las salidas guardadas, pero requieren los notebooks de
+definiciones presentes en el repositorio.
+
+La última sección de `escenarios.ipynb` regenera Word, PowerPoint y sus PDF con
+los resultados de la misma ejecución. Para convertir a PDF se necesita
+**LibreOffice**: `soffice` en el PATH o la instalación habitual en macOS.
+La semilla, versiones, tamaño del piloto y réplicas finales se guardan en
+[`configuracion_ejecucion.json`](resultados/escenarios/tablas/configuracion_ejecucion.json).
 
 ## Leer los datos
 
@@ -119,7 +141,7 @@ gráficos se mostrarán los códigos del caso, no esos años ficticios.
 Los días laborables y la Semana Santa se toman de
 `data/economia_eventos_mensuales.csv` y `data/calendario_mensual_a013.csv`.
 
-## Entrega prevista
+## Entrega
 
 - Resumen ejecutivo de **dos páginas**.
 - Plan mensual por segmento y resultados de los tres escenarios según la tabla 5.
@@ -128,5 +150,17 @@ Los días laborables y la Semana Santa se toman de
 
 Resumen y presentación están en `docs/`: [resumen ejecutivo](docs/resumen-ejecutivo.pdf)
 (Word y PDF) y [presentación](docs/presentacion.pdf) (PowerPoint y PDF). Sus cifras
-proceden de `resultados/tablas/`; si cambia el análisis, hay que regenerarlos. La
-sección 5 del notebook contiene la tabla 5 completa y el plan mensual recomendado.
+proceden de `resultados/escenarios/`, no de las salidas de `analisis.ipynb`.
+
+Puntos de consulta de la versión revisada:
+
+- [Tabla 5: siete segmentos y total](resultados/escenarios/tablas/tabla5_plan_recomendado_a013.csv).
+- [Pedidos del plan inicial, con fechas de decisión y llegada](resultados/escenarios/tablas/plan_pedidos_inicial_a013_a014.csv).
+- [Política y servicio por segmento](resultados/escenarios/tablas/politica_recomendada_a013.csv).
+- [Supuestos de escenarios](resultados/escenarios/tablas/parametros_escenarios_a013.csv).
+- [Sensibilidades y límites del resultado](resultados/escenarios/tablas/sensibilidades_plan_recomendado.csv).
+
+El objetivo del 95 % se refiere al **servicio anual medio del escenario central**
+en segmentos viables; no garantiza ese nivel en cada réplica ni en los extremos.
+A012 es evaluación retrospectiva, CSUV requiere una incertidumbre específica y
+los efectos no identificados se presentan como sensibilidades explícitas.

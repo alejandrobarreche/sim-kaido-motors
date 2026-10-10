@@ -1,0 +1,8 @@
+anio,segmento,adelanto_central,adelanto_min,adelanto_max,saldo_para_siguiente_anio,saldo_no_compensado_estimado,caida_compensada_estimada,metodo
+A012,B,49.27952709797671,32.8682766190999,65.69077757685352,49.27952709797671,49.27952709797671,0.0,"Exceso en meses con flag, contra A009/A010 escalados; A011 compensación separada"
+A012,C,446.78881046322715,390.4719101123595,503.1057108140948,446.78881046322715,446.78881046322715,0.0,"Exceso en meses con flag, contra A009/A010 escalados; A011 compensación separada"
+A012,MD,0.0,0.0,0.0,0.0,0.0,0.0,"Exceso en meses con flag, contra A009/A010 escalados; A011 compensación separada"
+A012,SSUV,0.0,0.0,0.0,0.0,0.0,0.0,"Exceso en meses con flag, contra A009/A010 escalados; A011 compensación separada"
+A012,CSUV,0.0,0.0,0.0,0.0,0.0,0.0,CSUV: porcentaje de exceso de mercado frente A009/A010; proxy limitado a ventas nov-dic
+A012,MSUV,361.74182023317036,0.0,723.4836404663407,361.74182023317036,361.74182023317036,0.0,"Exceso en meses con flag, contra A009/A010 escalados; A011 compensación separada"
+A012,S,20.57023946360153,7.084444444444443,34.05603448275862,20.57023946360153,20.57023946360153,0.0,"Exceso en meses con flag, contra A009/A010 escalados; A011 compensación separada"

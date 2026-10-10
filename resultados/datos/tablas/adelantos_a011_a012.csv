@@ -1,0 +1,15 @@
+anio,segmento,adelanto_central,adelanto_min,adelanto_max,saldo_para_siguiente_anio,saldo_no_compensado_estimado,caida_compensada_estimada,metodo
+A011,B,17.444444444444443,0.0,34.888888888888886,,17.444444444444443,0.0,"Exceso en meses con flag, contra A009/A010 escalados; A011 compensación separada"
+A011,C,138.00862392200975,121.85714285714283,154.16010498687663,,0.0,138.00862392200975,"Exceso en meses con flag, contra A009/A010 escalados; A011 compensación separada"
+A011,MD,60.026121839613495,47.36533665835412,72.68690702087287,,17.713888902033347,42.31223293758015,"Exceso en meses con flag, contra A009/A010 escalados; A011 compensación separada"
+A011,SSUV,157.93367392807747,105.23651452282161,210.63083333333333,,157.93367392807747,0.0,"Exceso en meses con flag, contra A009/A010 escalados; A011 compensación separada"
+A011,CSUV,0.0,0.0,0.0,,0.0,0.0,"Exceso en meses con flag, contra A009/A010 escalados; A011 compensación separada"
+A011,MSUV,76.94022431812385,0.0,153.8804486362477,,0.0,76.94022431812385,"Exceso en meses con flag, contra A009/A010 escalados; A011 compensación separada"
+A011,S,0.0,0.0,0.0,,0.0,0.0,"Exceso en meses con flag, contra A009/A010 escalados; A011 compensación separada"
+A012,B,49.27952709797671,32.8682766190999,65.69077757685352,49.27952709797671,49.27952709797671,0.0,"Exceso en meses con flag, contra A009/A010 escalados; A011 compensación separada"
+A012,C,446.78881046322715,390.4719101123595,503.1057108140948,446.78881046322715,446.78881046322715,0.0,"Exceso en meses con flag, contra A009/A010 escalados; A011 compensación separada"
+A012,MD,0.0,0.0,0.0,0.0,0.0,0.0,"Exceso en meses con flag, contra A009/A010 escalados; A011 compensación separada"
+A012,SSUV,0.0,0.0,0.0,0.0,0.0,0.0,"Exceso en meses con flag, contra A009/A010 escalados; A011 compensación separada"
+A012,CSUV,0.0,0.0,0.0,0.0,0.0,0.0,CSUV: porcentaje de exceso de mercado frente A009/A010; proxy limitado a ventas nov-dic
+A012,MSUV,361.74182023317036,0.0,723.4836404663407,361.74182023317036,361.74182023317036,0.0,"Exceso en meses con flag, contra A009/A010 escalados; A011 compensación separada"
+A012,S,20.57023946360153,7.084444444444443,34.05603448275862,20.57023946360153,20.57023946360153,0.0,"Exceso en meses con flag, contra A009/A010 escalados; A011 compensación separada"

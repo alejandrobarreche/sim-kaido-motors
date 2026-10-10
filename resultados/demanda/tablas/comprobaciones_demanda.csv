@@ -1,0 +1,26 @@
+comprobacion,correcto
+Fechas y segmentos contrato,True
+Proyecciones finitas y no negativas,True
+Central exactamente igual a la base,True
+Selección A009-A011 exclusivamente,True
+CSUV excluido de errores validables,True
+CSUV proxy positivo,True
+Rangos phi y rho,True
+Target observado coincide con ventas netas fuente,True
+Economía y sucesos futuros no cambian forecast operativo,True
+Modo condicionado separado responde a información futura,True
+Producto ignora datos posteriores al origen,True
+Ventas y producto futuros no cambian forecast operativo,True
+Target alternativo no contamina forecast principal,True
+Referencia estacional no repite pico A012,True
+Ledger usa sólo A012 y coincide con saldo A013,True
+Ledger solicitado común entre escenarios,True
+Duraciones pesimista/central/optimista 6/3/1,True
+Factor confianza_consumidor interviene en escenario,True
+Factor paro interviene en escenario,True
+Factor tipo_credito_consumo interviene en escenario,True
+Ayuda optimista interviene abr-dic,True
+Turismo interviene sólo mar-jun,True
+Producto sólo altera segmentos renovados,True
+Sensibilidad retraso MSUV tres meses y duración seis,True
+Parámetro de sesgo A011 no usa error de A011,True
