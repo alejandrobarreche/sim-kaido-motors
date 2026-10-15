@@ -1,0 +1,343 @@
+% Presentación de diez minutos para el comité de dirección. Cifras de
+% docs/resumen-ejecutivo y docs/report (ejecución de referencia, 1.000 repeticiones).
+% datos/central_mensual_a013.csv procede de
+% results/escenarios/tablas/plan_recomendado_mensual_a013_a014.csv (central, total);
+% datos/stock_red_a011_a012.csv suma por mes data/stock_red_mensual.csv.
+\documentclass[aspectratio=169,10pt]{beamer}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-noshorthands,es-nodecimaldot]{babel}
+\usepackage[book,semibold,lining,tabular]{FiraSans}
+\usepackage{textcomp}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{calc,positioning,arrows.meta}
+\usepackage{pgfplots}\pgfplotsset{compat=1.17}
+\usepgfplotslibrary{fillbetween}
+\usepackage{tcolorbox}\tcbuselibrary{skins}
+\usepackage{booktabs,array}
+
+% Blanco y negro; solo los escenarios llevan color.
+\definecolor{papel}{HTML}{FFFFFF}
+\definecolor{tinta}{HTML}{141414}
+\definecolor{sec}{HTML}{6E6E6E}
+\definecolor{linea}{HTML}{D6D6D6}
+\definecolor{claro}{HTML}{BEBEBE}
+\definecolor{acento}{HTML}{141414}
+\definecolor{cen}{HTML}{2A2A2A}
+\definecolor{pes}{HTML}{E0782A}
+\definecolor{opt}{HTML}{2F8F6A}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamercolor{normal text}{fg=tinta}
+\setbeamercolor{background canvas}{bg=papel}
+\setbeamersize{text margin left=13mm,text margin right=13mm}
+\setbeamertemplate{footline}{%
+  \hfill{\fontsize{7}{8}\selectfont\color{sec}\insertframenumber}\hspace*{13mm}\par\vspace*{5mm}}
+\setlength{\parindent}{0pt}
+\renewcommand{\arraystretch}{1.18}
+
+\newcommand{\ME}{\,M€}
+\newcommand{\co}{CO\textsubscript{2}}
+\newcommand{\serif}{\bfseries}
+
+% Cabecera en el flujo del texto: un título de dos líneas desplaza el contenido.
+\newcommand{\cab}[3]{% sección, título, subtítulo
+  \vspace*{0mm}\hyphenpenalty=10000 \exhyphenpenalty=10000 \raggedright
+  {\footnotesize\bfseries\color{sec}#1}\par\vspace{2mm}
+  {\serif\fontsize{17}{20}\selectfont\color{tinta}#2\par}\vspace{1.5mm}
+  {\small\color{sec}#3\par}\vspace{4mm}}
+
+% Cifra clave: filete superior, número en serif y etiqueta.
+\newcommand{\kf}{\fontsize{20}{22}\selectfont}
+\newlength{\kw}\setlength{\kw}{30mm}
+\newcommand{\kpi}[3][tinta]{%
+  \begin{minipage}[t]{\kw}
+  {\color{#1}\rule{\linewidth}{1.4pt}}\par\vspace{1.6mm}
+  {\serif\kf\color{#1}#2}\par\vspace{.8mm}
+  {\fontsize{7.5}{9}\selectfont\color{sec}\raggedright#3\par}
+  \end{minipage}}
+
+% Mensaje destacado: filete lateral, sin caja.
+\newtcolorbox{idea}[1][]{enhanced,sharp corners,boxrule=0pt,frame hidden,colback=tinta,coltext=white,
+  before upper=\raggedright,left=4mm,right=4mm,top=3mm,bottom=3mm,#1}
+
+% Decisión numerada.
+\newcommand{\dec}[2]{%
+  {\color{tinta}\rule{\linewidth}{.8pt}}\par\vspace{1.4mm}
+  \begin{minipage}[t]{12mm}{\bfseries\fontsize{20}{20}\selectfont\color{acento}#1}\end{minipage}%
+  \begin{minipage}[t]{\dimexpr\linewidth-12mm}\vspace{-3.2mm}\small#2\end{minipage}\par\vspace{1.6mm}}
+
+% Barra de la cascada.
+\def\w{11}
+\newcommand{\wf}[6]{\fill[#4] ({#1*15},#2) rectangle ({#1*15+\w},#3);
+  \node[font=\fontsize{7.5}{8}\selectfont,above] at ({#1*15+\w/2},#3) {#5};
+  \node[font=\fontsize{7}{8}\selectfont,text=sec,below] at ({#1*15+\w/2},0) {#6};}
+
+\pgfplotsset{kaido/.style={
+  axis lines=left,axis line style={linea},tick style={draw=none},
+  tick label style={font=\scriptsize,text=sec},label style={font=\scriptsize,text=sec},
+  ymajorgrids,major grid style={linea,line width=.3pt},
+  every node near coord/.append style={font=\fontsize{6.5}{7}\selectfont,text=tinta},
+  /pgf/number format/1000 sep={.},/pgf/number format/use comma}}
+
+\begin{document}
+
+% 1 · Portada
+{\setbeamertemplate{footline}{}
+\begin{frame}[t]
+\vspace*{24mm}
+{\bfseries\fontsize{30}{34}\selectfont Plan de fabricación A013}\par\vspace{4mm}
+{\large\color{sec}Kaido Motors España · Propuesta al comité de dirección}\par
+\vfill
+{\color{tinta}\rule{\linewidth}{1.4pt}}\par\vspace{2mm}
+{\footnotesize\color{sec}Simulación de Sistemas Logísticos · Universidad Alfonso X el Sabio}\par\vspace{6mm}
+\end{frame}}
+
+% 2 · Situación de partida
+\begin{frame}[t]
+\cab{01 · Situación de partida}{A012 terminó con 2.877 coches en la red, el 35\,\% con más de 90 días}{Stock en la red a fin de mes por antigüedad, de enero de A011 a diciembre de A012.}
+\begin{minipage}[t]{.6\linewidth}\vspace{0pt}
+\begin{tikzpicture}
+\begin{axis}[kaido,ybar stacked,width=\linewidth,height=48mm,bar width=2.4mm,
+ xmin=0.3,xmax=24.7,ymin=0,ymax=4500,ytick={0,2000,4000},yticklabel style={/pgf/number format/fixed},
+ xtick={1,7,13,19,24},xticklabels={ene A011,jul,ene A012,jul,dic},ylabel={coches},
+ legend style={font=\fontsize{6.5}{7}\selectfont,draw=none,fill=none,at={(0,1.02)},anchor=south west,legend columns=-1,
+   /tikz/every even column/.style={column sep=1.5mm}},area legend]
+\addplot[fill=cen,draw=none] table[x=n,y=s_0_90,col sep=comma]{datos/stock_red_a011_a012.csv};
+\addplot[fill=pes!50,draw=none] table[x=n,y=s_91_180,col sep=comma]{datos/stock_red_a011_a012.csv};
+\addplot[fill=pes,draw=none] table[x=n,y=s_mas_180,col sep=comma]{datos/stock_red_a011_a012.csv};
+\legend{hasta 90 días,91 a 180 días,más de 180 días}
+\end{axis}
+\end{tikzpicture}
+\end{minipage}\hfill
+\begin{minipage}[t]{.32\linewidth}\vspace{0pt}
+\setlength{\kw}{\linewidth}\renewcommand{\kf}{\fontsize{15}{17}\selectfont}
+\kpi{902.437}{coches en el mercado, un 3,4\,\% menos que en A011}\par\vspace{2mm}
+\kpi{20.706}{compras de clientes de Kaido, un 5,9\,\% más}\par\vspace{2mm}
+\kpi[pes]{35,3\,\%}{de los coches en la red llevaba más de 90 días}
+\end{minipage}
+\end{frame}
+
+% 3 · Demanda
+\begin{frame}[t]
+\cab{02 · Demanda A013}{La previsión central es de 19.077 compradores, un 7,9\,\% menos que en A012}{Demanda mensual prevista sin las compras que en A012 se adelantaron por el cambio de normativa.}
+\begin{tikzpicture}
+\begin{axis}[kaido,ybar,width=\linewidth,height=42mm,bar width=6mm,
+ symbolic x coords={Ene,Feb,Mar,Abr,May,Jun,Jul,Ago,Sep,Oct,Nov,Dic},xtick=data,
+ ymin=0,ymax=2600,ytick={0,1000,2000},yticklabel style={/pgf/number format/fixed,/pgf/number format/precision=0},
+ nodes near coords,enlarge x limits=.05,ylabel={compradores}]
+\addplot[fill=cen,draw=none] coordinates {(Ene,1067)(Feb,1356)(Mar,1772)(Abr,1929)(May,1801)(Jun,2284)(Jul,1878)(Ago,1177)(Sep,1306)(Oct,1440)(Nov,1400)(Dic,1667)};
+\end{axis}
+\end{tikzpicture}
+\end{frame}
+
+% 4 · Cómo se decide
+\begin{frame}[t]
+\cab{03 · Cómo se decide}{Un pedido tarda tres meses en llegar a la red}{Las llegadas de enero y febrero, 2.110 coches en cada mes, ya estaban pedidas al empezar el año.}
+\vspace{3mm}
+\begin{tikzpicture}[x=1mm,y=1mm]
+ \draw[linea,line width=.8pt] (0,0) -- (126,0);
+ \foreach \x/\t/\s/\c in {12/Enero/se decide el pedido/acento, 45/Febrero/en tránsito/claro, 78/Marzo/en tránsito/claro, 111/Abril/llega a la red/tinta}{
+   \fill[\c] (\x,0) circle (1.6);
+   \node[above=3mm,font=\bfseries\large] at (\x,0) {\t};
+   \node[below=3mm,font=\footnotesize,text=sec] at (\x,0) {\s};}
+\end{tikzpicture}
+\par\vspace{5mm}
+\begin{idea}
+{\footnotesize\bfseries\color{white!70!tinta}Regla de pedido}\par\vspace{1.5mm}
+{\large Pedido = demanda prevista del mes de llegada + colchón para atender al 95\,\% \textminus{} stock que habrá en la red}
+\end{idea}
+\end{frame}
+
+% 5 · Plan de fabricación
+\begin{frame}[t]
+\cab{03 · Plan de fabricación}{El plan pide 16.144 coches, con más pedidos en marzo y septiembre}{Pedidos por mes de decisión y segmento, en coches. Los de octubre a diciembre llegan en el primer trimestre de A014.}
+{\fontsize{7.5}{9}\selectfont\setlength{\tabcolsep}{3.3pt}\renewcommand{\arraystretch}{1.02}
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrrrrrrrrrrr@{}}
+\toprule
+ & Ene & Feb & Mar & Abr & May & Jun & Jul & Ago & Sep & Oct & Nov & Dic & \textbf{Total}\\
+\midrule
+MSUV & 353 & 622 & 693 & 593 & 293 & 336 & 452 & 516 & 633 & 314 & 309 & 468 & \textbf{5.582}\\
+SSUV & 659 & 494 & 750 & 530 & 253 & 245 & 325 & 412 & 496 & 219 & 335 & 426 & \textbf{5.144}\\
+CSUV & 0 & 218 & 347 & 310 & 149 & 112 & 191 & 253 & 272 & 122 & 185 & 257 & \textbf{2.416}\\
+C & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 172 & 220 & 163 & 201 & 232 & \textbf{988}\\
+B & 153 & 132 & 168 & 121 & 66 & 45 & 67 & 78 & 100 & 64 & 103 & 136 & \textbf{1.233}\\
+MD & 0 & 15 & 59 & 36 & 17 & 29 & 42 & 33 & 33 & 31 & 40 & 45 & \textbf{380}\\
+S & 80 & 72 & 74 & 30 & 0 & 0 & 0 & 0 & 0 & 56 & 83 & 6 & \textbf{401}\\
+\midrule
+\textbf{Total} & \textbf{1.245} & \textbf{1.553} & \textbf{2.091} & \textbf{1.620} & \textbf{778} & \textbf{767} & \textbf{1.077} & \textbf{1.464} & \textbf{1.754} & \textbf{969} & \textbf{1.256} & \textbf{1.570} & \textbf{16.144}\\
+\bottomrule
+\end{tabular*}}
+\par\vspace{2.5mm}
+{\footnotesize\color{sec}C no recibe pedidos hasta agosto porque empieza el año con mucho stock, y S no recibe ninguno entre mayo y septiembre.}
+\end{frame}
+
+% 6 · Central
+\begin{frame}[t]
+\cab{04 · Escenario central}{En el escenario central se atiende al 97,6\,\% de los compradores}{Ventas y stock en la red por mes, con los costes y el margen del año.}
+\begin{minipage}[t]{.4\linewidth}\vspace{0pt}
+\setlength{\kw}{.46\linewidth}\renewcommand{\kf}{\fontsize{15}{17}\selectfont}
+\kpi{4.075}{stock medio en la red (2,6 meses)}\hfill\kpi[pes]{547}{coches con más de 90 días al cierre}\par\vspace{2.5mm}
+\kpi{2,73\ME}{coste del stock}\hfill\kpi{40,50\ME}{gasto comercial (VM)}\par\vspace{2.5mm}
+\kpi{65,62\ME}{margen de la marca (CVP)}\hfill\kpi{62,88\ME}{resultado}
+\end{minipage}\hfill
+\begin{minipage}[t]{.55\linewidth}\vspace{0pt}
+\begin{tikzpicture}
+\begin{axis}[kaido,width=\linewidth,height=44mm,xmin=1,xmax=12,ymin=0,ymax=5600,
+ xtick={1,...,12},xticklabels={E,F,M,A,M,J,J,A,S,O,N,D},
+ ytick={0,2000,4000},yticklabel style={/pgf/number format/fixed},
+ ylabel={coches}]
+\addplot[name path=sv1,draw=none,forget plot] table[x=mes,y=ventas_p10,col sep=comma]{datos/central_mensual_a013.csv};
+\addplot[name path=sv2,draw=none,forget plot] table[x=mes,y=ventas_p90,col sep=comma]{datos/central_mensual_a013.csv};
+\addplot[cen!14,forget plot] fill between[of=sv1 and sv2];
+\addplot[name path=ss1,draw=none,forget plot] table[x=mes,y=stock_p10,col sep=comma]{datos/central_mensual_a013.csv};
+\addplot[name path=ss2,draw=none,forget plot] table[x=mes,y=stock_p90,col sep=comma]{datos/central_mensual_a013.csv};
+\addplot[pes!22,forget plot] fill between[of=ss1 and ss2];
+\addplot[cen,line width=1.3pt] table[x=mes,y=ventas_med,col sep=comma]{datos/central_mensual_a013.csv};
+\addplot[pes,line width=1.3pt] table[x=mes,y=stock_med,col sep=comma]{datos/central_mensual_a013.csv};
+\node[anchor=south west,font=\scriptsize\bfseries,text=pes] at (axis cs:7.2,3500) {stock en la red};
+\node[anchor=north,font=\scriptsize\bfseries,text=cen] at (axis cs:9.5,850) {ventas};
+\end{axis}
+\end{tikzpicture}\par
+{\fontsize{6.5}{8}\selectfont\color{sec}Mediana mensual; la banda va de una de cada diez repeticiones por abajo a una de cada diez por arriba.}
+\end{minipage}
+\end{frame}
+
+% 7 · Dónde se gana
+\begin{frame}[t]
+\cab{04 · Dónde se gana}{MSUV, SSUV y CSUV aportan el 93\,\% del resultado central}{Resultado por segmento en el escenario central, en millones de euros.}
+\begin{tikzpicture}
+\begin{axis}[kaido,xbar,width=134mm,height=46mm,bar width=4mm,ymajorgrids=false,xmajorgrids=true,
+ symbolic y coords={B,C,S,MD,CSUV,SSUV,MSUV},ytick={B,C,S,MD,CSUV,SSUV,MSUV},xmin=0,xmax=36,
+ nodes near coords,nodes near coords align={horizontal},enlarge y limits=.08,
+ point meta=rawx,/pgf/number format/fixed,/pgf/number format/fixed zerofill,/pgf/number format/precision=2,
+ xtick={0,10,20,30},xticklabel style={/pgf/number format/precision=0,/pgf/number format/fixed zerofill=false}]
+\addplot[fill=claro,draw=none,bar shift=0pt] coordinates {(0.02,B)(1.15,C)(1.55,S)(1.63,MD)};
+\addplot[fill=cen,draw=none,bar shift=0pt] coordinates {(11.77,CSUV)(14.86,SSUV)(31.91,MSUV)};
+\end{axis}
+\end{tikzpicture}
+\end{frame}
+
+% 8 · Escenarios
+\begin{frame}[t]
+\cab{05 · Escenarios}{Resultados del mismo plan en los tres escenarios}{Medias de 1.000 repeticiones por escenario. Los escenarios no tienen probabilidad asignada.}
+{\fontsize{7.5}{8.8}\selectfont\renewcommand{\arraystretch}{1.05}
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrr@{}}
+\toprule
+ & \textcolor{pes}{\bfseries Pesimista} & \textcolor{cen}{\bfseries Central} & \textcolor{opt}{\bfseries Optimista}\\
+\midrule
+Coches vendidos & 12.151 & 18.539 & 24.952\\
+Coches fabricados & 6.371 & 15.756 & 23.268\\
+Stock medio en la red (coches; meses de venta) & 3.489; 2,7 & 4.075; 2,6 & 3.358; 1,4\\
+Coches con más de 90 días a fin de año & 601 & 547 & 404\\
+Coste del stock (M€) & 2,20 & 2,73 & 2,38\\
+Ventas perdidas (coches) & 3.501 & 478 & 3.493\\
+Transfers (coches) & 0 & 0 & 0\\
+Gasto comercial, VM (M€) & 27,63 & 40,50 & 53,36\\
+Margen de la marca, CVP (M€) & 46,49 & 65,62 & 88,23\\
+Compradores atendidos & 77,8\,\% & 97,6\,\% & 87,9\,\%\\
+\midrule
+\textbf{Resultado (M€)} & \textbf{\textcolor{pes}{3,09}} & \textbf{\textcolor{cen}{62,88}} & \textbf{\textcolor{opt}{91,37}}\\
+\bottomrule
+\end{tabular*}}
+\end{frame}
+
+% 9 · Pesimista
+\begin{frame}[t]
+\cab{05 · Escenario pesimista}{En el escenario pesimista, el \co{} y el arancel restan 41,2\ME}{Del margen de la marca (CVP) al resultado, en millones de euros.}
+\begin{minipage}[t]{.5\linewidth}\vspace{0pt}
+\begin{tikzpicture}[x=1mm,y=.72mm]
+ \wf{0}{0}{46.49}{cen}{46,49}{CVP}
+ \wf{1}{44.29}{46.49}{pes}{\textminus2,20}{Stock}
+ \wf{2}{7.73}{44.29}{pes}{\textminus36,56}{\co}
+ \wf{3}{3.09}{7.73}{pes}{\textminus4,64}{Arancel}
+ \wf{4}{0}{3.09}{tinta}{3,09}{Resultado}
+ \draw[linea] (-2,0) -- (73,0);
+\end{tikzpicture}
+\end{minipage}\hfill
+\begin{minipage}[t]{.42\linewidth}\vspace{2mm}
+\begin{idea}
+{\footnotesize Con esos costes, cada coche nuevo de B, C, SSUV y S pierde dinero y el plan deja de pedirlos. Quedan sin atender 3.501 compradores, cuyas ventas habrían restado 3,1\ME.}\par\vspace{2mm}
+{\footnotesize Si se siguiera pidiendo para atenderlos, el resultado sería de {\color{pes}\textminus0,6\ME}.}
+\end{idea}
+\end{minipage}
+\end{frame}
+
+% 10 · Optimista
+\begin{frame}[t]
+\cab{05 · Escenario optimista}{En el escenario optimista faltan coches para 3.493 compradores}{Los pedidos solo se corrigen a tres meses vista y no llegan a cubrir la subida de la demanda.}
+\begin{minipage}[t]{.5\linewidth}\vspace{0pt}
+\setlength{\kw}{.46\linewidth}\renewcommand{\kf}{\fontsize{17}{19}\selectfont}
+\kpi[opt]{24.952}{coches vendidos}\hfill\kpi[opt]{91,4\ME}{resultado}\par\vspace{3mm}
+\kpi[pes]{3.493}{compradores perdidos}\hfill\kpi[pes]{13,0\ME}{margen no obtenido}
+\par\vspace{4mm}
+{\footnotesize\color{sec}El stock medio baja a 1,4 meses de venta y el tipo de cambio ahorra 5,5\ME.}
+\end{minipage}\hfill
+\begin{minipage}[t]{.42\linewidth}\vspace{0pt}
+{\footnotesize\color{sec}Compradores perdidos por segmento\par}\vspace{1mm}
+\begin{tikzpicture}
+\begin{axis}[kaido,xbar,width=44mm,height=32mm,bar width=3mm,ymajorgrids=false,axis x line=none,
+ symbolic y coords={CSUV,MSUV,SSUV},ytick=data,xmin=0,xmax=1800,
+ nodes near coords,nodes near coords align={horizontal},enlarge y limits=.4,point meta=rawx,
+ /pgf/number format/fixed,/pgf/number format/precision=0]
+\addplot[fill=pes,draw=none] coordinates {(481,CSUV)(907,MSUV)(1483,SSUV)};
+\end{axis}
+\end{tikzpicture}
+\end{minipage}
+\end{frame}
+
+% 11 · Riesgo por segmento
+\begin{frame}[t]
+\cab{06 · Riesgo por segmento}{SSUV es el segmento con el servicio más ajustado}{Compradores atendidos por segmento en el escenario central, en porcentaje. La línea discontinua marca el objetivo del 95\,\%.}
+\begin{minipage}[t]{.63\linewidth}\vspace{0pt}
+\begin{tikzpicture}
+\begin{axis}[kaido,ybar,width=\linewidth,height=46mm,bar width=4mm,
+ symbolic x coords={B,C,MD,SSUV,CSUV,MSUV,S},xtick=data,ymin=80,ymax=101,ytick={80,90,100},
+ yticklabel style={/pgf/number format/fixed,/pgf/number format/precision=0},
+ legend style={font=\scriptsize,draw=none,fill=none,/tikz/every even column/.style={column sep=3mm},at={(0,1.04)},anchor=south west,legend columns=-1},
+ enlarge x limits=.08]
+\addplot[fill=cen,draw=none] coordinates {(B,96.5)(C,99.6)(MD,99.7)(SSUV,95.4)(CSUV,98.3)(MSUV,99.2)(S,96.0)};
+\addplot[fill=claro,draw=none] coordinates {(B,89.6)(C,98.7)(MD,99.0)(SSUV,89.3)(CSUV,93.1)(MSUV,97.1)(S,85.5)};
+\draw[tinta,dashed,line width=.7pt] ([xshift=-4mm]axis cs:B,95)--([xshift=4mm]axis cs:S,95);
+\addlegendimage{tinta,dashed,line width=.7pt}
+\legend{Media,Se supera en 9 de cada 10 repeticiones,Objetivo}
+\end{axis}
+\end{tikzpicture}
+\end{minipage}\hfill
+\begin{minipage}[t]{.3\linewidth}\vspace{8mm}
+\begin{idea}
+{\small SSUV queda por debajo del 95\,\% en cuatro de cada diez repeticiones.}
+\end{idea}
+\end{minipage}
+\end{frame}
+
+% 12 · Decisiones
+\begin{frame}[t]
+\cab{07 · Decisiones}{Decisiones que se proponen al comité}{}
+\dec{1}{\textbf{Aprobar el plan} como punto de partida y revisarlo cada mes: solo se puede cambiar lo que llega dentro de tres meses o más.}
+\dec{2}{\textbf{Dar prioridad a MSUV, SSUV y CSUV.} Son los que más dejan y los que más compradores pierden si el año sale mejor.}
+\dec{3}{\textbf{No pedir coches que pierden dinero.} Si se confirma la prima de \co{} o el arancel, frenar los pedidos de B, C, SSUV y S.}
+\dec{4}{\textbf{Vigilar las ventas de tres meses} frente a la previsión. CSUV, con poca historia, es el segmento más incierto.}
+\end{frame}
+
+% 13 · Resumen
+\begin{frame}[t]
+\cab{08 · Resumen}{Resumen del plan para A013}{Cifras del escenario central salvo que se indique otro.}
+\setlength{\kw}{30mm}
+\kpi{16.144}{coches a fabricar en A013}\hfill
+\kpi{18.539}{coches vendidos}\hfill
+\kpi{97,6\,\%}{compradores atendidos}\hfill
+\kpi{62,9\ME}{resultado tras costes}
+\par\vspace{8mm}
+\setlength{\kw}{30mm}
+\kpi[pes]{3,1\ME}{resultado en el escenario pesimista}\hfill
+\kpi[opt]{91,4\ME}{resultado en el escenario optimista}\hfill
+\begin{minipage}[t]{64mm}\vspace{2mm}
+{\footnotesize\color{sec}En ocho de cada diez repeticiones del escenario central, el resultado queda entre 56,4 y 69,5\ME.\par}
+\end{minipage}
+\end{frame}
+
+\end{document}

@@ -37,7 +37,7 @@ La carpeta es autocontenida para compilar. Las tablas y las figuras constituyen 
 instantánea de la ejecución de referencia del **10 de octubre de 2026**; no vuelven
 a estimar el modelo durante la compilación. Si cambian los resultados del proyecto,
 deben actualizarse las tablas, los datos de gráficos y las interpretaciones citadas.
-Cada figura y tabla indica su fuente dentro de `resultados/`.
+Cada figura y tabla indica su fuente dentro de `../../results`.
 
 El diseño toma del enunciado la tipografía serif, la estructura académica, la
 numeración de apartados y los acentos azules. Añade recursos didácticos para explicar

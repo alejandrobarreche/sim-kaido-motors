@@ -1,0 +1,241 @@
+% Resumen ejecutivo de dos páginas para el comité de dirección (apartado 9.4 del
+% enunciado). Mismo estilo que docs/report. Las cifras proceden de la ejecución de
+% referencia del 10 de octubre de 2026 (results/escenarios/tablas/).
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-tabla,es-nodecimaldot,es-noshorthands]{babel}
+\spanishplainpercent
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[a4paper,left=17mm,right=17mm,top=14mm,bottom=14mm,headheight=12pt,headsep=5mm,footskip=7mm]{geometry}
+\usepackage{graphicx}
+\graphicspath{{../report/figuras/}}
+\usepackage[table]{xcolor}
+\definecolor{azul}{HTML}{0072B2}
+\definecolor{optimista}{HTML}{009E73}
+\definecolor{pesimista}{HTML}{D55E00}
+\definecolor{tinta}{HTML}{252A30}
+\definecolor{gris}{HTML}{60666D}
+\definecolor{fondo}{HTML}{F1F5F8}
+\color{tinta}
+\usepackage{booktabs,tabularx,array,makecell}
+\renewcommand{\arraystretch}{1.1}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{R}{>{\raggedleft\arraybackslash}X}
+\newcolumntype{N}{>{\raggedleft\arraybackslash}p{28mm}}
+\usepackage{eurosym}
+\usepackage{enumitem}
+\setlist{nosep,leftmargin=1.2em,topsep=2pt}
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf,labelsep=period,justification=justified,singlelinecheck=false,skip=3pt}
+\usepackage{titlesec}
+\titleformat{\section}{\large\bfseries}{\thesection.}{.5em}{}
+\titlespacing*{\section}{0pt}{7pt plus 2pt}{3pt}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{gris}Kaido Motors España · Resumen ejecutivo A013}
+\fancyhead[R]{\small\thepage/2}
+\renewcommand{\headrulewidth}{0pt}
+\usepackage[skins]{tcolorbox}
+\newtcolorbox{idea}[1]{enhanced,colback=fondo,colframe=gris!35,
+  boxrule=.4pt,arc=0pt,left=7pt,right=7pt,top=4pt,bottom=4pt,
+  title={#1},colbacktitle=fondo,coltitle=tinta,fonttitle=\bfseries,
+  titlerule=0pt,before skip=5pt,after skip=5pt}
+\usepackage[unicode,colorlinks=true,linkcolor=azul,urlcolor=azul,
+  pdftitle={Kaido Motors España: resumen ejecutivo del plan A013},
+  pdfauthor={Proyecto Kaido Motors},pdfsubject={Simulación de Sistemas Logísticos}]{hyperref}
+\newcommand{\MEE}{\,M\euro}
+\newcommand{\fuente}[1]{\par\smallskip{\footnotesize\color{gris}\textit{Fuente:} #1.\par}}
+\newcommand{\pes}{\textcolor{pesimista}{\textbf{Pesimista}}}
+\newcommand{\cen}{\textcolor{azul}{\textbf{Central}}}
+\newcommand{\opt}{\textcolor{optimista}{\textbf{Optimista}}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\setlength{\tabcolsep}{4.2pt}
+
+\begin{document}
+\thispagestyle{empty}
+\noindent
+\begin{minipage}[b]{.74\linewidth}
+  {\scshape\small Simulación de Sistemas Logísticos · Para el comité de dirección}\par
+  \vspace{1mm}
+  {\Large\bfseries Kaido Motors España: plan de fabricación A013}\par
+  \vspace{.5mm}
+  {\large\color{azul}Resumen ejecutivo}
+\end{minipage}\hfill
+\begin{minipage}[b]{.2\linewidth}\raggedleft
+  \includegraphics[width=\linewidth]{logo-uax.png}
+\end{minipage}
+\par\vspace{1mm}{\color{gris!40}\rule{\linewidth}{.4pt}}
+
+\begin{idea}{La propuesta}
+Se propone fabricar \textbf{16.144 coches} en A013, con el reparto mensual de la
+tabla~\ref{tab:plan}, y corregir los pedidos cada mes con las ventas reales. En el
+escenario central, este plan vende unos \textbf{18.540 coches}, atiende al
+\textbf{97,6\,\%} de los compradores, deja unos 2.220 coches en la red a fin de año
+y obtiene \textbf{62,9\MEE} después de pagar la venta y el stock. MSUV, SSUV y CSUV
+aportan el 93\,\% de ese resultado, por lo que conviene darles prioridad. C no
+necesita pedidos hasta agosto porque empieza el año con mucho stock, y B deja muy
+poco margen: si la matriz carga la prima de CO$_2$, cada coche adicional de B
+genera pérdidas.
+\end{idea}
+
+\section{Cuántos coches fabricar cada mes}
+Lo que se pide en un mes llega a la red tres meses después: lo que se venda
+hasta marzo ya viene en camino. La tabla recoge los pedidos que se deciden en
+A013; los de octubre a diciembre son coches para enero--marzo de A014.
+
+\begin{table}[h]\centering
+\caption{Plan inicial de fabricación por mes de pedido, en coches. Escenario central.}\label{tab:plan}
+\small
+\begin{tabular}{@{}lrrrrrrrrrrrr>{\bfseries}r@{}}
+\toprule
+Segmento & Ene & Feb & Mar & Abr & May & Jun & Jul & Ago & Sep & Oct & Nov & Dic & Total \\
+\midrule
+MSUV · SUV medio    & 353 & 622 & 693 & 593 & 293 & 336 & 452 & 516 & 633 & 314 & 309 & 468 & 5.582 \\
+SSUV · SUV pequeño  & 659 & 494 & 750 & 530 & 253 & 245 & 325 & 412 & 496 & 219 & 335 & 426 & 5.144 \\
+CSUV · SUV compacto & 0 & 218 & 347 & 310 & 149 & 112 & 191 & 253 & 272 & 122 & 185 & 257 & 2.416 \\
+C · compacto        & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 172 & 220 & 163 & 201 & 232 & 988 \\
+B · pequeño         & 153 & 132 & 168 & 121 & 66 & 45 & 67 & 78 & 100 & 64 & 103 & 136 & 1.233 \\
+MD · berlina media  & 0 & 15 & 59 & 36 & 17 & 29 & 42 & 33 & 33 & 31 & 40 & 45 & 380 \\
+S · descapotable    & 80 & 72 & 74 & 30 & 0 & 0 & 0 & 0 & 0 & 56 & 83 & 6 & 401 \\
+\midrule
+\rowcolor{fondo}
+\textbf{Total} & 1.245 & 1.553 & 2.091 & 1.620 & 778 & 767 & 1.077 & 1.464 & 1.754 & 969 & 1.256 & 1.570 & 16.144 \\
+\bottomrule
+\end{tabular}
+\fuente{\texttt{results/escenarios/tablas/plan\_pedidos\_inicial\_a013\_a014.csv}}
+\end{table}
+
+\vspace{-2mm}
+Cada pedido cubre la demanda prevista de su mes de llegada, más un colchón por
+segmento para atender al menos al 95\,\% de los compradores en el escenario
+central, menos el stock que habrá en la red. En cada segmento se eligió el
+colchón que más resultado deja cumpliendo ese 95\,\%. El plan es el punto de partida: al revisar cada
+mes, el central acaba fabricando de media 15.756 coches.
+
+Tres datos explican la forma del plan:
+\begin{itemize}
+\item \textbf{C} empieza el año con mucho stock: se venden los coches que ya hay
+  y no se piden más hasta agosto.
+\item \textbf{S} no recibe pedidos de mayo a septiembre: vende unos 370 coches al
+  año y su stock ya cubre meses de venta.
+\item \textbf{Mayo y junio} bajan porque llegan en agosto y septiembre, meses de
+  poca venta; marzo sube para llegar en junio, el mes de más demanda.
+\end{itemize}
+
+\section{Qué pasa con el plan en el escenario central}
+Se venden 18.539 coches de una demanda de 19.017; se pierden unos 480
+compradores, el 2,4\,\%. El stock medio en la red es de 4.075 coches, unos
+2,6 meses de venta, y a fin de año quedan 547 coches con más de 90 días.
+El gasto comercial (VM) es de 40,5\MEE{} y el stock le cuesta a la marca
+2,7\MEE. Queda un margen (CVP) de 65,6\MEE{} y un resultado de 62,9\MEE{}.
+El plan no recurre a transfers, los coches traídos del stock de otros
+países europeos. En una de cada diez repeticiones el resultado baja de 56,4\MEE{} y en
+otra de cada diez supera los 69,5\MEE.
+
+\clearpage
+\section{Cuánto cambia si el año sale peor o mejor}
+Las tres columnas parten del mismo plan. En pesimista y optimista la demanda y los
+costes son otros, y los pedidos solo se pueden corregir a tres meses vista.
+
+\begin{table}[h]\centering
+\caption{Resultados de A013 con el plan propuesto (tabla 5 del enunciado), total
+de la marca. Medias de 1.000 repeticiones por escenario; entre paréntesis, la
+diferencia con el central.}\label{tab:tabla5}
+\small
+\begin{tabularx}{\linewidth}{@{}YNNN@{}}
+\toprule
+Indicador & \pes & \cen & \opt \\
+\midrule
+Demanda de clientes (coches) & 15.652 & 19.017 & 28.445 \\
+Coches vendidos (coches) & 12.151 \,{\color{gris}\footnotesize(\textminus6.388)} & 18.539 & 24.952 \,{\color{gris}\footnotesize(+6.413)} \\
+Coches fabricados, pedidos A013 (coches) & 6.371 \,{\color{gris}\footnotesize(\textminus9.385)} & 15.756 & 23.268 \,{\color{gris}\footnotesize(+7.512)} \\
+Stock medio en la red (coches; meses de venta) & 3.489; 2,7 & 4.075; 2,6 & 3.358; 1,4 \\
+Coches con más de 90 días a fin de año & 601 & 547 & 404 \\
+Coste del stock para la marca (M\euro) & 2,20 & 2,73 & 2,38 \\
+Ventas perdidas (coches) & 3.501 & 478 & 3.493 \\
+\quad Margen no obtenido por ellas (M\euro) & \textminus3,09 & 1,47 & 12,96 \\
+Transfers (coches y M\euro) & 0 & 0 & 0 \\
+Gasto comercial, VM (M\euro) & 27,63 \,{\color{gris}\footnotesize(\textminus12,87)} & 40,50 & 53,36 \,{\color{gris}\footnotesize(+12,86)} \\
+Margen de la marca, CVP (M\euro) & 46,49 \,{\color{gris}\footnotesize(\textminus19,12)} & 65,62 & 88,23 \,{\color{gris}\footnotesize(+22,61)} \\
+\midrule
+\quad Prima de CO$_2$ / arancel / tipo de cambio (M\euro) & 36,56 / 4,64 / 0 & 0 / 0 / 0 & 0 / 0 / \textminus5,52 \\
+\rowcolor{fondo}
+\textbf{Resultado tras costes (M\euro)} & \textbf{3,09} \,{\color{gris}\footnotesize(\textminus59,79)} & \textbf{62,88} & \textbf{91,37} \,{\color{gris}\footnotesize(+28,49)} \\
+\quad Intervalo P10--P90 (M\euro) & 1,87--4,35 & 56,45--69,47 & 84,52--98,39 \\
+Compradores atendidos (\%) & 77,8 & 97,6 & 87,9 \\
+\bottomrule
+\end{tabularx}
+\fuente{\texttt{results/escenarios/tablas/tabla5\_plan\_recomendado\_a013.csv}.
+Resultado = CVP $-$ stock $-$ transfers $-$ CO$_2$ $-$ arancel $-$ cambio; un coste
+de cambio negativo es un ahorro. Detalle por segmento en el anexo del informe}
+\end{table}
+
+\vspace{-2mm}
+\textbf{Pesimista.} El resultado baja a 3,1\MEE, en parte por la menor demanda
+y sobre todo por dos costes nuevos: la prima de CO$_2$ (36,6\MEE) y un arancel
+(4,6\MEE). Con ellos, cada coche nuevo de B, C, SSUV y S pierde dinero, de modo que
+el plan deja de pedirlos y vende el stock que ya hay en la red. Así quedan sin
+atender unos 3.500 compradores, cuyas ventas habrían restado 3,1\MEE. Si se
+siguiera pidiendo para atenderlos, el servicio subiría al 98,6\,\% y el resultado
+sería de \textminus0,6\MEE; con un arancel de 1.000\,\euro{} por coche, el año
+terminaría en \textminus1,5\MEE.
+
+\textbf{Optimista.} Se venden unos 6.400 coches más y el resultado sube a
+91,4\MEE, de los que 5,5\MEE{} proceden del ahorro por tipo de cambio. La demanda
+crece más deprisa de lo que permiten corregir los pedidos, así que quedan sin
+atender unos 3.490 compradores, sobre todo de SSUV y MSUV, con 13,0\MEE{} de margen
+no obtenido. El stock medio baja a 1,4 meses de venta.
+
+\begin{table}[h]\centering
+\caption{Lo esencial por segmento: medias de A013 con el plan propuesto.}\label{tab:segmentos}
+\small
+\begin{tabularx}{\linewidth}{@{}l*{9}{R}@{}}
+\toprule
+& \multicolumn{3}{c}{Coches vendidos} & \multicolumn{3}{c}{Coches fabricados (A013)} & \multicolumn{3}{c}{Resultado (M\euro)} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(l){8-10}
+Segmento & \textcolor{pesimista}{Pes.} & \textcolor{azul}{Cen.} & \textcolor{optimista}{Opt.}
+         & \textcolor{pesimista}{Pes.} & \textcolor{azul}{Cen.} & \textcolor{optimista}{Opt.}
+         & \textcolor{pesimista}{Pes.} & \textcolor{azul}{Cen.} & \textcolor{optimista}{Opt.} \\
+\midrule
+MSUV & 4.556 & 5.554 & 7.067 & 4.335 & 5.501 & 7.292 & 4,72 & 31,91 & 42,61 \\
+SSUV & 1.915 & 5.387 & 7.077 & 0 & 4.882 & 6.822 & \textminus1,03 & 14,86 & 21,60 \\
+CSUV & 2.816 & 3.327 & 4.692 & 1.751 & 2.357 & 3.935 & 3,52 & 11,77 & 18,01 \\
+C    & 1.796 & 2.258 & 3.451 & 0 & 959 & 2.283 & \textminus3,16 & 1,15 & 4,00 \\
+B    & 426 & 1.212 & 1.578 & 0 & 1.170 & 1.602 & \textminus1,24 & 0,02 & 0,47 \\
+MD   & 360 & 433 & 571 & 286 & 375 & 546 & 0,45 & 1,63 & 2,31 \\
+S    & 282 & 368 & 516 & 0 & 513 & 788 & \textminus0,16 & 1,55 & 2,37 \\
+\midrule
+\rowcolor{fondo}
+\textbf{Total} & 12.151 & 18.539 & 24.952 & 6.371 & 15.756 & 23.268 & 3,09 & 62,88 & 91,37 \\
+\bottomrule
+\end{tabularx}
+\fuente{\texttt{results/escenarios/tablas/tabla5\_plan\_recomendado\_a013.csv}}
+\end{table}
+
+\vspace{-2mm}
+\section{Qué decidir y qué vigilar}
+\begin{enumerate}
+\item \textbf{Aprobar el plan de la tabla~\ref{tab:plan} como punto de partida} y
+  revisarlo cada mes: solo se puede cambiar lo que llega dentro de tres meses o más.
+\item \textbf{Dar prioridad a MSUV, SSUV y CSUV.} Son los que más dejan y los que
+  más compradores pierden si el año sale mejor. SSUV es el más ajustado: en cuatro
+  de cada diez repeticiones del central atiende a menos del 95\,\%.
+\item \textbf{No pedir coches que pierden dinero.} Si se confirma la prima de
+  CO$_2$ o el arancel, frenar los pedidos nuevos de B, C, SSUV y S aunque haya
+  demanda, y vender primero lo que ya está en la red.
+\item \textbf{Vigilar las ventas de tres meses frente a la previsión}, segmento a
+  segmento. Si las ventas caen cuando la red está vacía, la causa es la falta de
+  coches y no una menor demanda.
+  CSUV, con poca historia, es el segmento con la previsión más incierta.
+\end{enumerate}
+
+{\footnotesize\color{gris}Los escenarios no tienen probabilidad asignada; el
+intervalo P10--P90 recoge la variación dentro de cada uno. El resultado es la
+contribución tras los costes del modelo, no el beneficio contable. Datos y nombres
+camuflados; material de uso exclusivamente docente.\par}
+\end{document}

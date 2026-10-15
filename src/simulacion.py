@@ -177,7 +177,7 @@ def avanzar_mes(
     transfers en esta versión). El coste del stock es el de la marca: 2 €/coche/día
     mientras el coche lleva menos de 180 días facturado, incluidos los días de A012 de
     los coches que ya estaban en la red. No incluye los intereses del concesionario.
-    Devuelve las cohortes que quedan y los resultados del mes.
+    Devuelve las cohortes que quedan y los results del mes.
     """
     entrada = np.append(entrada, MITAD_MES[mes])
     unidades = np.append(unidades, float(llegada))
@@ -437,7 +437,7 @@ def simular_escenario(
     z: float | pd.Series = Z_DEFECTO,
     llegada_perdida: tuple[str, int] | None = None,
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Repite el año con los errores `factores` y devuelve sus resultados.
+    """Repite el año con los errores `factores` y devuelve sus results.
 
     La demanda real de cada repetición es la del escenario (`demanda_prevista`) por
     el error, redondeada a coches enteros. `z` puede ser un valor común o uno por

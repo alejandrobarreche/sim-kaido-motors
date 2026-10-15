@@ -43,5 +43,5 @@ de los CSV, como `A013`, `MSUV`, `NA` o `codigos_A013`, conservan su formato ori
 ## Conservación
 
 Trabajar con estos archivos como entradas de solo lectura. Guardar datos derivados
-en `resultados/`, acompañados de su procedimiento de cálculo. No duplicar los CSV
+en `../results`, acompañados de su procedimiento de cálculo. No duplicar los CSV
 en carpetas `raw/` y `processed/` mientras no haya una necesidad real.
